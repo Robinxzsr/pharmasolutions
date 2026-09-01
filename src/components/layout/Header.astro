@@ -1,0 +1,93 @@
+---
+/**
+ * Header — transparent overlay nav.
+ *
+ * The design floats the nav directly over the hero artwork rather than in a
+ * bar, so this is positioned absolute over the first Scene. `currentPath`
+ * drives aria-current for the active link.
+ */
+import Container from "../ui/Container.astro";
+import Button from "../ui/Button.astro";
+import { primaryNav, site } from "../../lib/site";
+
+const currentPath = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+
+const links = primaryNav.filter((l) => !l.primary);
+const cta = primaryNav.find((l) => l.primary);
+---
+
+<header class="absolute inset-x-0 top-0 z-50">
+  <Container width="wide">
+    <nav class="flex items-center justify-between py-6" aria-label="Primary">
+      <a href="/" class="font-display text-2xl text-cream-50">{site.name}</a>
+
+      <ul class="hidden items-center gap-8 md:flex">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                aria-current={isActive(link.href) ? "page" : undefined}
+                class="text-cream-50/85 transition-colors hover:text-cream-50 aria-[current=page]:text-cream-50"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="flex items-center gap-3">
+        {cta && <Button href={cta.href} variant="secondary" size="sm">{cta.label}</Button>}
+
+        <button
+          type="button"
+          class="md:hidden text-cream-50"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          data-menu-toggle
+        >
+          <span class="sr-only">Toggle menu</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </Container>
+
+  <div id="mobile-nav" hidden class="md:hidden">
+    <Container width="wide">
+      <ul class="flex flex-col gap-4 pb-8">
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} class="text-cream-50 text-lg">
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </div>
+</header>
+
+<script>
+  function initMenu() {
+    const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    const panel = document.getElementById("mobile-nav");
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener("click", () => {
+      const open = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  }
+
+  initMenu();
+  document.addEventListener("astro:page-load", initMenu);
+</script>

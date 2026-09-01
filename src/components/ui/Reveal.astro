@@ -1,0 +1,65 @@
+---
+/**
+ * Reveal — scroll-triggered entrance for content blocks.
+ *
+ * Progressive enhancement: content renders visible in CSS and is only hidden
+ * once JS confirms it can animate it back in. If JS fails or reduced-motion
+ * is set, everything simply shows.
+ */
+interface Props {
+  /** Stagger in ms, for revealing a row of cards in sequence. */
+  delay?: number;
+  /** Element to render as. */
+  as?: "div" | "section" | "li" | "article";
+  class?: string;
+}
+
+const { delay = 0, as: Tag = "div", class: className = "" } = Astro.props;
+---
+
+<Tag data-reveal style={delay ? `--reveal-delay:${delay}ms` : undefined} class:list={[className]}>
+  <slot />
+</Tag>
+
+<style>
+  [data-reveal] {
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+</style>
+
+<script>
+  function initReveal() {
+    const targets = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    if (targets.length === 0) return;
+
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      return; // Leave everything visible.
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          el.classList.remove("reveal-hidden");
+          el.classList.add("reveal-shown");
+          io.unobserve(el); // Reveal once; never re-hide.
+        }
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    for (const el of targets) {
+      if (el.dataset.revealBound) continue;
+      el.dataset.revealBound = "true";
+      el.classList.add("reveal-hidden");
+      io.observe(el);
+    }
+  }
+
+  initReveal();
+  document.addEventListener("astro:page-load", initReveal);
+</script>

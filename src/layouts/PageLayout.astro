@@ -1,0 +1,36 @@
+---
+/**
+ * PageLayout — standard content page.
+ *
+ * Wraps BaseLayout with a titled hero band, for pages that are mostly prose
+ * (About, FAQ, Legal). Pages that are a bespoke sequence of illustrated
+ * Scenes (Home, Pricing) should use BaseLayout directly instead.
+ */
+import BaseLayout from "./BaseLayout.astro";
+import Scene from "../components/scene/Scene.astro";
+import Container from "../components/ui/Container.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Optional deck shown under the page title. */
+  lede?: string;
+  noindex?: boolean;
+}
+
+const { title, description, lede, noindex } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <Scene ground="sky" height="auto" align="end" class="pt-32 pb-20">
+    {/* Hero artwork layers slot in here once illustrations exist. */}
+    <Container>
+      <h1 class="text-[length:var(--text-display-lg)] text-cream-50">{title}</h1>
+      {lede && <p class="mt-5 max-w-xl text-lg text-cream-50/85">{lede}</p>}
+    </Container>
+  </Scene>
+
+  <Container width="prose" class="py-20">
+    <slot />
+  </Container>
+</BaseLayout>

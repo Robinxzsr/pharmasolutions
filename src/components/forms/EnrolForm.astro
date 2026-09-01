@@ -1,0 +1,102 @@
+---
+/**
+ * EnrolForm — the application capture.
+ *
+ * Posts to /api/enrol. Works without JS (standard form POST); with JS it
+ * submits in place and swaps in a confirmation.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+
+const field = "w-full rounded-soft border border-ink-900/20 bg-surface px-4 py-3 focus:outline-none";
+const label = "block text-sm font-medium";
+---
+
+<form method="POST" action="/api/enrol" data-enrol-form class:list={["flex flex-col gap-5", className]}>
+  <div>
+    <label for="enrol-name" class={label}>Your name</label>
+    <input id="enrol-name" name="name" type="text" required autocomplete="name" class:list={[field, "mt-1.5"]} />
+  </div>
+
+  <div>
+    <label for="enrol-email" class={label}>Email</label>
+    <input id="enrol-email" name="email" type="email" required autocomplete="email" class:list={[field, "mt-1.5"]} />
+  </div>
+
+  <div>
+    <label for="enrol-stage" class={label}>Where are you in your studies?</label>
+    <input
+      id="enrol-stage"
+      name="stage"
+      type="text"
+      required
+      placeholder="e.g. 2nd year pharmacy, FY1 doctor"
+      class:list={[field, "mt-1.5"]}
+    />
+  </div>
+
+  <div>
+    <label for="enrol-goals" class={label}>What do you want to get out of the program?</label>
+    <textarea id="enrol-goals" name="goals" rows="4" class:list={[field, "mt-1.5 resize-y"]}></textarea>
+  </div>
+
+  <label class="flex items-start gap-3 text-sm">
+    <input type="checkbox" name="consent" required class="mt-1" />
+    <span>
+      I agree to the <a href="/legal/privacy" class="underline">privacy policy</a> and to being
+      contacted about my application.
+    </span>
+  </label>
+
+  {/* Honeypot. */}
+  <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" class="absolute h-0 w-0 overflow-hidden opacity-0" />
+
+  <button
+    type="submit"
+    class="self-start rounded-pill bg-ink-900 px-8 py-4 text-cream-50 transition-colors hover:bg-ink-700 disabled:opacity-50"
+  >
+    Submit application
+  </button>
+
+  <p data-enrol-status role="status" aria-live="polite" class="min-h-5 text-sm"></p>
+</form>
+
+<script>
+  function initEnrol() {
+    const form = document.querySelector<HTMLFormElement>("[data-enrol-form]");
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = "true";
+
+    const status = form.querySelector<HTMLElement>("[data-enrol-status]");
+    const submit = form.querySelector<HTMLButtonElement>("button[type=submit]");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!status || !submit) return;
+
+      submit.disabled = true;
+      status.textContent = "Sending…";
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: new FormData(form),
+        });
+        const result = await response.json();
+
+        status.textContent = result.message ?? (response.ok ? "Application received." : "Something went wrong.");
+        if (response.ok) form.reset();
+      } catch {
+        status.textContent = "Network error. Please try again.";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  }
+
+  initEnrol();
+  document.addEventListener("astro:page-load", initEnrol);
+</script>

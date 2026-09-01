@@ -1,0 +1,77 @@
+---
+/**
+ * BaseLayout — the only place that owns <head>.
+ *
+ * Every page renders through this (usually via PageLayout). It handles SEO,
+ * font preloading, and the header/footer frame. Pages supply content only.
+ */
+import { Font } from "astro:assets";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import { site } from "../lib/site";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Absolute or site-relative path to the social share image. */
+  ogImage?: string;
+  /** Suppresses indexing for thank-you pages, drafts, etc. */
+  noindex?: boolean;
+}
+
+const { title, description = site.description, ogImage, noindex = false } = Astro.props;
+
+/** Home gets the bare brand name; everything else is suffixed. */
+const pageTitle = Astro.url.pathname === "/" ? `${site.name} — ${site.tagline}` : `${title} · ${site.name}`;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
+const socialImage = new URL(ogImage ?? "/og-default.png", Astro.site ?? site.url);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={site.locale} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/* Emits @font-face + preload links for the self-hosted families. */}
+    <Font cssVariable="--font-fraunces" preload />
+    <Font cssVariable="--font-inter" preload />
+
+    <slot name="head" />
+  </head>
+
+  <body class="bg-surface text-content min-h-dvh">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-soft focus:bg-cream-50 focus:px-4 focus:py-2"
+    >
+      Skip to content
+    </a>
+
+    <Header />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,26 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import { getCollection, render } from "astro:content";
+
+const entries = (await getCollection("faq")).sort((a, b) => a.data.order - b.data.order);
+
+/** Render each answer's markdown up front — Astro components can't await in a loop body. */
+const answers = await Promise.all(
+  entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content }))
+);
+---
+
+<PageLayout title="FAQ" lede="The questions we get asked most.">
+  <dl class="not-prose flex flex-col gap-8">
+    {
+      answers.map(({ entry, Content }) => (
+        <div>
+          <dt class="font-display text-xl">{entry.data.question}</dt>
+          <dd class="mt-2 text-content-muted">
+            <Content />
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</PageLayout>

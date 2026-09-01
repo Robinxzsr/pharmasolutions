@@ -1,0 +1,94 @@
+---
+/**
+ * Pricing — plan cards wired to Stripe Checkout.
+ *
+ * Plans come from the content collection; the button posts the price id to
+ * /api/checkout, which re-validates it server-side before charging.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Scene from "../components/scene/Scene.astro";
+import Container from "../components/ui/Container.astro";
+import { getCollection } from "astro:content";
+
+const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Pricing" description="Coaching plans for the Pharmasolutions program.">
+  <Scene ground="sky" align="end" class="pt-32 pb-20">
+    <Container>
+      <h1 class="text-[length:var(--text-display-lg)] text-cream-50">Pricing</h1>
+    </Container>
+  </Scene>
+
+  <Scene ground="cream">
+    <Container class="py-24">
+      <div class="grid gap-6 md:grid-cols-3">
+        {
+          plans.map((plan) => (
+            <article class="flex flex-col rounded-card bg-surface p-8 shadow-sm">
+              <h2 class="font-display text-2xl">{plan.data.name}</h2>
+              <p class="mt-2 text-content-muted">{plan.data.blurb}</p>
+              <p class="mt-6 text-[length:var(--text-display-sm)]">{plan.data.priceDisplay}</p>
+
+              <ul class="mt-6 flex flex-col gap-2 text-content-muted">
+                {plan.data.features.map((feature) => (
+                  <li>{feature}</li>
+                ))}
+              </ul>
+
+              <button
+                type="button"
+                data-checkout={plan.data.stripePriceId}
+                class="mt-8 rounded-pill bg-ink-900 px-6 py-3 text-cream-50 transition-colors hover:bg-ink-700 disabled:opacity-50"
+              >
+                Choose {plan.data.name}
+              </button>
+            </article>
+          ))
+        }
+      </div>
+
+      <p data-checkout-status role="status" aria-live="polite" class="mt-6 min-h-5 text-sm"></p>
+    </Container>
+  </Scene>
+</BaseLayout>
+
+<script>
+  function initCheckout() {
+    const status = document.querySelector<HTMLElement>("[data-checkout-status]");
+
+    document.querySelectorAll<HTMLButtonElement>("[data-checkout]").forEach((button) => {
+      if (button.dataset.bound) return;
+      button.dataset.bound = "true";
+
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        if (status) status.textContent = "Opening secure checkout…";
+
+        try {
+          const response = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ priceId: button.dataset.checkout }),
+          });
+          const result = await response.json();
+
+          // Hand off to Stripe's hosted page — we never touch card details.
+          if (response.ok && result.url) {
+            window.location.href = result.url;
+            return;
+          }
+
+          if (status) status.textContent = result.message ?? "Could not start checkout.";
+        } catch {
+          if (status) status.textContent = "Network error. Please try again.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+  }
+
+  initCheckout();
+  document.addEventListener("astro:page-load", initCheckout);
+</script>

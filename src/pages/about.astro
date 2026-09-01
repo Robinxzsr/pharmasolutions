@@ -1,0 +1,36 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+
+const coaches = (await getCollection("coaches")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<PageLayout title="About" lede="Who runs the program, and why it's taught this way.">
+  <p>{/* TODO: origin story and teaching philosophy. */}</p>
+
+  <h2 id="coaches" class="mt-16 text-[length:var(--text-display-sm)]">Coaches</h2>
+
+  <ul class="not-prose mt-8 grid gap-8 sm:grid-cols-2">
+    {
+      coaches.map((coach) => (
+        <li>
+          {coach.data.portrait && (
+            <Image
+              src={coach.data.portrait}
+              alt={`Portrait of ${coach.data.name}`}
+              width={320}
+              height={320}
+              class="rounded-card"
+            />
+          )}
+          <h3 class="mt-4 font-display text-xl">{coach.data.name}</h3>
+          <p class="text-content-muted">{coach.data.role}</p>
+          {coach.data.credentials && (
+            <p class="mt-1 text-sm text-content-muted">{coach.data.credentials}</p>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</PageLayout>

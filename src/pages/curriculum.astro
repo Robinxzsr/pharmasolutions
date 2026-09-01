@@ -1,0 +1,34 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import { getCollection } from "astro:content";
+
+const modules = (await getCollection("curriculum")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<PageLayout
+  title="Curriculum"
+  lede="Twelve weeks, built mechanism-first — each module earns its place before the next one starts."
+>
+  <ol class="not-prose flex flex-col gap-10">
+    {
+      modules.map((module, index) => (
+        <li>
+          <p class="text-sm text-content-muted">
+            Module {String(index + 1).padStart(2, "0")} · {module.data.duration}
+          </p>
+          <h2 class="mt-1 text-[length:var(--text-display-sm)]">{module.data.title}</h2>
+          <p class="mt-2 text-content-muted">{module.data.summary}</p>
+          {module.data.topics.length > 0 && (
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {module.data.topics.map((topic) => (
+                <li class="rounded-pill bg-surface-alt px-3 py-1 text-sm">{topic}</li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</PageLayout>

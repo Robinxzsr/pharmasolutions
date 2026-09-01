@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   DESIGN TOKENS
+   Single source of truth for the illustrated-editorial style.
+   Swap values here and the whole site follows — never hardcode a hex in a
+   component.
+   ========================================================================== */
+
+@theme {
+  /* --- Palette -------------------------------------------------------------
+     Sampled from the illustrated reference: a warm sky-to-field gradient with
+     terracotta accents. Each ramp runs light -> deep so scene layers can be
+     stacked with real atmospheric depth.
+  */
+
+  /* Sky — upper scene bands, hero backdrops */
+  --color-sky-50: #eaf5fc;
+  --color-sky-100: #cbe8f7;
+  --color-sky-200: #a3d6ef;
+  --color-sky-300: #7cc2e4;
+  --color-sky-400: #57aad6;
+  --color-sky-500: #3d90c4;
+  --color-sky-600: #2f74a6;
+
+  /* Ridge — mid-ground mountains, receding depth planes */
+  --color-ridge-300: #7d9ac9;
+  --color-ridge-400: #5b7db5;
+  --color-ridge-500: #45619b;
+  --color-ridge-600: #344b7c;
+  --color-ridge-700: #26375c;
+
+  /* Field — the golden foreground band; primary brand warmth */
+  --color-field-100: #fdeecb;
+  --color-field-200: #f9d891;
+  --color-field-300: #f4bd57;
+  --color-field-400: #eda52c;
+  --color-field-500: #d98e1f;
+  --color-field-600: #b4711a;
+
+  /* Clay — rooftops, accents, secondary CTA */
+  --color-clay-300: #e08a67;
+  --color-clay-400: #c96745;
+  --color-clay-500: #a94f32;
+
+  /* Neutrals — paper-warm, never pure grey */
+  --color-cream-50: #fefaf1;
+  --color-cream-100: #fdf4e3;
+  --color-cream-200: #f5e9d3;
+  --color-ink-500: #4a5468;
+  --color-ink-700: #2b3654;
+  --color-ink-900: #1a2238;
+
+  /* --- Semantic aliases ----------------------------------------------------
+     Components reference THESE, not the raw ramps above. Re-theming the site
+     means repointing this block only.
+  */
+  --color-surface: var(--color-cream-50);
+  --color-surface-alt: var(--color-cream-100);
+  --color-content: var(--color-ink-900);
+  --color-content-muted: var(--color-ink-500);
+  --color-content-invert: var(--color-cream-50);
+  --color-brand: var(--color-field-400);
+  --color-brand-deep: var(--color-field-600);
+  --color-accent: var(--color-clay-400);
+
+  /* --- Typography ----------------------------------------------------------
+     Two families only. A high-warmth display serif carries every heading;
+     a neutral grotesque handles body copy so the serif keeps its impact.
+
+     `--font-fraunces` / `--font-inter` are emitted by the Astro Fonts API
+     (see `fonts` in astro.config.mjs) and already include fallback metrics.
+  */
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+
+  /* Fluid display scale — clamp() so oversized headings survive mobile */
+  --text-display-xl: clamp(3rem, 8vw, 6.5rem);
+  --text-display-lg: clamp(2.5rem, 6vw, 4.5rem);
+  --text-display-md: clamp(2rem, 4.5vw, 3rem);
+  --text-display-sm: clamp(1.5rem, 3vw, 2rem);
+
+  /* --- Shape ---------------------------------------------------------------
+     The reference leans on fully-rounded pills for inputs and buttons, with
+     soft rounding elsewhere. Nothing is sharp.
+  */
+  --radius-soft: 0.75rem;
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+
+  /* --- Motion --------------------------------------------------------------
+     Slow, eased, painterly. Never bouncy.
+  */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-reveal: 900ms;
+  --duration-ui: 220ms;
+
+  /* --- Scene depth ---------------------------------------------------------
+     Parallax layers read back-to-front. Kept as tokens so a Scene can declare
+     depth semantically instead of guessing z-index numbers.
+  */
+  --z-scene-sky: 0;
+  --z-scene-far: 10;
+  --z-scene-mid: 20;
+  --z-scene-near: 30;
+  --z-scene-content: 40;
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Scene bands butt directly against each other — kill subpixel seams. */
+    background-color: var(--color-surface);
+    color: var(--color-content);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    /* Fraunces optical sizing: large headings get higher contrast strokes. */
+    font-variation-settings: "SOFT" 40, "WONK" 1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Honour the OS setting site-wide. Every animation below is opt-in via
+     motion-safe, but this catches third-party and inline cases too. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink-900);
+    outline-offset: 3px;
+    border-radius: var(--radius-soft);
+  }
+}
+
+/* ==========================================================================
+   UTILITIES
+   Style-specific primitives that Tailwind has no equivalent for.
+   ========================================================================== */
+
+@utility grain {
+  /* Painterly tooth. Sits above the artwork, below the content, and is
+     pointer-transparent so it never eats clicks. */
+  position: relative;
+  isolation: isolate;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.28;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+}
+
+@utility full-bleed {
+  /* Escapes any centred container to span the viewport — scene bands must
+     always touch both edges. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+@utility reveal-hidden {
+  /* Paired with Reveal.astro. Declared in CSS (not inline) so content is
+     visible if JS never runs. */
+  opacity: 0;
+  transform: translateY(1.5rem);
+}
+
+@utility reveal-shown {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-reveal) var(--ease-out-soft),
+    transform var(--duration-reveal) var(--ease-out-soft);
+}

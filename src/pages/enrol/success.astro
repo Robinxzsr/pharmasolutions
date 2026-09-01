@@ -1,0 +1,20 @@
+---
+/**
+ * Post-checkout landing page.
+ *
+ * Deliberately does NOT grant access — the Stripe webhook is the only
+ * trustworthy signal that payment succeeded. This page just confirms.
+ */
+import PageLayout from "../../layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="You're in"
+  lede="Payment received — welcome to the program."
+  noindex
+>
+  <p>
+    A confirmation email with your onboarding details is on its way. If it hasn't arrived
+    within a few minutes, check your spam folder or get in touch.
+  </p>
+</PageLayout>

@@ -1,0 +1,14 @@
+{
+  "name": "Core",
+  "blurb": "The full twelve-week cohort.",
+  "priceDisplay": "£000",
+  "interval": "one-time",
+  "stripePriceId": "price_placeholder_core",
+  "features": [
+    "Twelve weekly group sessions",
+    "Full curriculum access",
+    "Cohort community"
+  ],
+  "highlighted": true,
+  "order": 1
+}

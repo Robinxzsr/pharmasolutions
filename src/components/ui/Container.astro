@@ -1,0 +1,25 @@
+---
+/**
+ * Container — horizontal rhythm.
+ *
+ * Scene bands are full-bleed; the text inside them is not. Every piece of
+ * content sits in one of these so measure and gutters stay consistent.
+ */
+interface Props {
+  /** `prose` caps at a readable line length; `wide` is for grids and scenes. */
+  width?: "prose" | "default" | "wide";
+  class?: string;
+}
+
+const { width = "default", class: className = "" } = Astro.props;
+
+const widthClass = {
+  prose: "max-w-[68ch]",
+  default: "max-w-6xl",
+  wide: "max-w-[90rem]",
+}[width];
+---
+
+<div class:list={["mx-auto w-full px-6 md:px-10", widthClass, className]}>
+  <slot />
+</div>

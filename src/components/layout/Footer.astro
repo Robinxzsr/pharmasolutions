@@ -1,0 +1,95 @@
+---
+/**
+ * Footer — the illustrated closing scene.
+ *
+ * In the reference this is not a plain footer: it is the final Scene band,
+ * carrying nav columns over the sky and the newsletter capture over the
+ * field. The artwork slots are left empty until illustrations land.
+ */
+import Scene from "../scene/Scene.astro";
+import Container from "../ui/Container.astro";
+import NewsletterForm from "../forms/NewsletterForm.astro";
+import { footerNav, socials, site } from "../../lib/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer>
+  {/* Upper band — nav over sky. */}
+  <Scene ground="sky" class="pt-16">
+    {/* <SceneLayer slot="layers" src={ridge} depth="far" /> */}
+    <Container width="wide">
+      <div class="grid gap-10 pb-24 md:grid-cols-[1.4fr_repeat(4,1fr)]">
+        <div class="max-w-xs">
+          <p class="font-display text-2xl text-cream-50">{site.name}</p>
+          <p class="mt-3 text-cream-50/80">{site.tagline}</p>
+
+          <ul class="mt-6 flex gap-3">
+            {
+              socials.map((s) => (
+                <li>
+                  <a
+                    href={s.href}
+                    rel="me noopener"
+                    class="grid size-10 place-items-center rounded-pill bg-cream-50/15 text-cream-50 transition-colors hover:bg-cream-50/25"
+                  >
+                    <span class="sr-only">{s.label}</span>
+                    <span aria-hidden="true" class="text-sm">{s.label.slice(0, 2)}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        {
+          footerNav.map((group) => (
+            <nav aria-label={group.heading}>
+              <h2 class="font-display text-lg text-cream-50">{group.heading}</h2>
+              <ul class="mt-4 flex flex-col gap-2.5">
+                {group.links.map((link) => (
+                  <li>
+                    <a
+                      href={link.href}
+                      class="text-cream-50/80 transition-colors hover:text-cream-50"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))
+        }
+      </div>
+    </Container>
+  </Scene>
+
+  {/* Lower band — newsletter over field. */}
+  <Scene ground="field">
+    {/* <SceneLayer slot="layers" src={wheatField} depth="near" /> */}
+    <Container width="wide">
+      <div class="grid items-center gap-10 py-20 md:grid-cols-2">
+        <div><!-- Illustration focal point sits here. --></div>
+
+        <div>
+          <h2 class="text-[length:var(--text-display-md)] text-ink-900">Stay in the loop</h2>
+          <p class="mt-3 max-w-sm text-ink-700">
+            Occasional notes on pharmacology teaching, plus first access to new cohorts.
+          </p>
+          <NewsletterForm class="mt-6 max-w-md" />
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col gap-4 border-t border-ink-900/15 py-6 text-sm text-ink-700 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p>© {year} {site.name}. All rights reserved.</p>
+        <ul class="flex gap-6">
+          <li><a href="/legal/privacy" class="hover:text-ink-900">Privacy Policy</a></li>
+          <li><a href="/legal/terms" class="hover:text-ink-900">Terms of Service</a></li>
+        </ul>
+      </div>
+    </Container>
+  </Scene>
+</footer>

@@ -1,0 +1,33 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import { getCollection } from "astro:content";
+
+/** Drafts never ship to production; they stay visible in dev. */
+const posts = (await getCollection("blog", ({ data }) => import.meta.env.DEV || !data.draft)).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+---
+
+<PageLayout title="Resources" lede="Notes on pharmacology, teaching, and how to actually retain any of it.">
+  {posts.length === 0 && <p class="text-content-muted">No articles yet.</p>}
+
+  <ul class="not-prose flex flex-col gap-10">
+    {
+      posts.map((post) => (
+        <li>
+          <time datetime={post.data.publishedAt.toISOString()} class="text-sm text-content-muted">
+            {post.data.publishedAt.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </time>
+          <h2 class="mt-1 text-[length:var(--text-display-sm)]">
+            <a href={`/blog/${post.id}`} class="hover:text-accent">{post.data.title}</a>
+          </h2>
+          <p class="mt-2 text-content-muted">{post.data.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</PageLayout>

@@ -1,0 +1,48 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Scene from "../../components/scene/Scene.astro";
+import Container from "../../components/ui/Container.astro";
+import { Image } from "astro:assets";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", ({ data }) => import.meta.env.DEV || !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const author = await getEntry(post.data.author);
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <Scene ground="sky" align="end" class="pt-32 pb-16">
+    <Container width="prose">
+      <h1 class="text-[length:var(--text-display-lg)] text-cream-50">{post.data.title}</h1>
+      <p class="mt-4 text-cream-50/80">
+        <time datetime={post.data.publishedAt.toISOString()}>
+          {post.data.publishedAt.toLocaleDateString("en-GB", { dateStyle: "long" })}
+        </time>
+        {author && <> · {author.data.name}</>}
+      </p>
+    </Container>
+  </Scene>
+
+  {
+    post.data.cover && (
+      <Image
+        src={post.data.cover}
+        alt={post.data.coverAlt ?? ""}
+        widths={[640, 1024, 1600]}
+        sizes="100vw"
+        class="full-bleed"
+      />
+    )
+  }
+
+  <Container width="prose" class="py-20">
+    {/* TODO: apply the article type scale here in the design pass. */}
+    <article><Content /></article>
+  </Container>
+</BaseLayout>

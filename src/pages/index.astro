@@ -1,0 +1,89 @@
+---
+/**
+ * Home — a vertical sequence of illustrated Scene bands.
+ *
+ * Structure only: each Scene marks where a painted band goes and what copy
+ * sits on it. Artwork layers and final styling land in the design pass.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Scene from "../components/scene/Scene.astro";
+import Container from "../components/ui/Container.astro";
+import Button from "../components/ui/Button.astro";
+import Reveal from "../components/ui/Reveal.astro";
+import { site } from "../lib/site";
+---
+
+<BaseLayout title="Home" description={site.description}>
+  {/* Band 1 — hero. Sky -> ridge -> foreground, content over the top. */}
+  <Scene ground="sky" height="full" align="center">
+    {/*
+      <SceneLayer slot="layers" src={clouds}   depth="sky" anchor="top" />
+      <SceneLayer slot="layers" src={ridgeFar} depth="far" />
+      <SceneLayer slot="layers" src={village}  depth="mid" />
+      <SceneLayer slot="layers" src={field}    depth="near" />
+    */}
+    <Container width="wide">
+      <Reveal class="max-w-2xl">
+        <h1 class="text-[length:var(--text-display-xl)] text-cream-50">
+          Pharmacology that finally clicks.
+        </h1>
+        <p class="mt-6 max-w-lg text-lg text-cream-50/85">
+          Small-cohort coaching that teaches drug mechanisms as a system you can reason
+          from — not a list you have to survive.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <Button href="/enrol" variant="secondary" size="lg">Apply for the next cohort</Button>
+          <Button href="/curriculum" variant="ghost" size="lg" class="text-cream-50">
+            See the curriculum
+          </Button>
+        </div>
+      </Reveal>
+    </Container>
+  </Scene>
+
+  {/* Band 2 — the problem / positioning. */}
+  <Scene ground="cream" height="auto">
+    <Container class="py-28">
+      <Reveal>
+        <h2 class="text-[length:var(--text-display-md)]">Why most pharmacology revision fails</h2>
+      </Reveal>
+    </Container>
+  </Scene>
+
+  {/* Band 3 — how the program works. Three steps. */}
+  <Scene ground="none" height="auto">
+    <Container class="py-28">
+      <Reveal>
+        <h2 class="text-[length:var(--text-display-md)]">How the coaching works</h2>
+      </Reveal>
+    </Container>
+  </Scene>
+
+  {/* Band 4 — curriculum preview, pulled from the content collection. */}
+  <Scene ground="ridge" height="band">
+    <Container class="py-28">
+      <Reveal>
+        <h2 class="text-[length:var(--text-display-md)] text-cream-50">Inside the program</h2>
+      </Reveal>
+    </Container>
+  </Scene>
+
+  {/* Band 5 — testimonials. */}
+  <Scene ground="cream" height="auto">
+    <Container class="py-28">
+      <Reveal>
+        <h2 class="text-[length:var(--text-display-md)]">What learners say</h2>
+      </Reveal>
+    </Container>
+  </Scene>
+
+  {/* Band 6 — closing call to action, leading into the footer scene. */}
+  <Scene ground="none" height="auto">
+    <Container class="py-28">
+      <Reveal>
+        <h2 class="text-[length:var(--text-display-lg)]">Ready to start?</h2>
+        <Button href="/enrol" size="lg" class="mt-8">Apply now</Button>
+      </Reveal>
+    </Container>
+  </Scene>
+</BaseLayout>

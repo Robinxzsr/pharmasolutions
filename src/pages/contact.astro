@@ -1,0 +1,11 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import { site } from "../lib/site";
+---
+
+<PageLayout title="Contact" lede="Questions about fit, timing, or funding? Ask away.">
+  <p>
+    Email us at <a href={`mailto:${site.email}`} class="underline">{site.email}</a> and we'll
+    reply within two working days.
+  </p>
+</PageLayout>
