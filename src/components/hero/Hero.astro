@@ -89,7 +89,12 @@ const { heading, subheading, primaryCta, secondaryCta } = Astro.props;
 
   @media (max-width: 820px) {
     .hero-copy {
-      padding-top: 13vh;
+      /* The vertical nav now lives permanently in the top-left corner (no
+         collapse behind a toggle any more), so this has to clear its full
+         stacked height, not just the old single logo row. A vh-only value
+         shrinks away on short devices and lets the two collide — the fixed
+         floor guarantees clearance regardless of viewport height. */
+      padding-top: max(13vh, 210px);
     }
   }
 </style>
