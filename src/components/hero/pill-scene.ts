@@ -35,9 +35,28 @@ const BLOOM_SCENE = 1;
 const BLOOM_SCALE = 0.5;
 /** Depth of the background plate, in world units behind the pill plane. */
 const BG_DEPTH = -6;
-/** Pill placement as a percentage of the viewport — centred in the hands' gap. */
-const PILL_X = 50;
-const PILL_Y = 70;
+/**
+ * Pill placement, as a percentage of the BACKGROUND IMAGE — not the viewport.
+ *
+ * The plate is cover-fitted, so the hands shift and crop as the window aspect
+ * changes. Anchoring to image space means the pill tracks the hands instead of
+ * drifting away from them.
+ *
+ * Measured from the source plate (2048x1153): the right hand's fingertip sits
+ * at x 66.7%, y 67.8%. Y here is that fingertip's height, so the pill meets it.
+ */
+const PILL_X = 50; // centred in the gap between the hands
+const PILL_Y = 67.8; // the right hand's fingertip height
+
+/**
+ * Which point ON THE PILL lands on PILL_Y, as a fraction of the pill's height
+ * measured from its bottom. 0.75 puts the pill's three-quarter mark on the
+ * fingertip; 0.5 would centre the pill there.
+ *
+ * Solved against the model's real bounding box at load, so it stays correct if
+ * the model is ever rebuilt at a different size.
+ */
+const PILL_ANCHOR = 0.75;
 
 export function initPillScene({
   canvas,
@@ -110,6 +129,9 @@ export function initPillScene({
     tex.generateMipmaps = true;
     tex.needsUpdate = true;
     fitBackgroundCover();
+    // The pill's anchor reads the crop this just set. If the model won the
+    // race, its placement was computed against an unfitted plate — redo it.
+    positionPill();
     bgReady = true;
     maybeReveal();
   });
@@ -169,16 +191,54 @@ export function initPillScene({
     sheenColor: new THREE.Color(0xffa060),
   });
 
-  /** Screen percentage to world position on the z=0 plane. */
-  function screenToWorld(xPct: number, yPct: number) {
-    const ndc = new THREE.Vector3((xPct / 100) * 2 - 1, -(yPct / 100) * 2 + 1, 0);
-    ndc.unproject(camera);
-    const dir = ndc.sub(camera.position).normalize();
-    const dist = -camera.position.z / dir.z;
-    return camera.position.clone().add(dir.multiplyScalar(dist));
+  /**
+   * Background-image percentage to world position on the z=0 plane.
+   *
+   * Walks the same cover-fit the plate uses: image UV -> visible window (via
+   * the texture's repeat/offset) -> world units on the plate -> scaled forward
+   * onto the pill's plane. Because both planes are centred on the camera axis,
+   * that last step is a straight ratio of their distances.
+   */
+  function imageToWorld(xPct: number, yPct: number) {
+    const { w, h } = viewSizeAt(bgDist);
+
+    // Texture V runs bottom-up; the incoming percentage runs top-down.
+    const u = xPct / 100;
+    const v = 1 - yPct / 100;
+
+    // Where that pixel falls across the visible crop, 0..1.
+    const xFrac = (u - bgTexture.offset.x) / bgTexture.repeat.x;
+    const yFrac = (v - bgTexture.offset.y) / bgTexture.repeat.y;
+
+    // The plate is centred on the origin, so 0.5 is the middle.
+    const xAtPlate = (xFrac - 0.5) * w;
+    const yAtPlate = (yFrac - 0.5) * h;
+
+    // Project from the plate's depth onto z=0 so it lines up on screen.
+    const scale = camera.position.z / bgDist;
+    return new THREE.Vector3(xAtPlate * scale, yAtPlate * scale, 0);
   }
 
   let pillMesh: THREE.Group | null = null;
+  /** The model's height in world units, measured once at load. */
+  let pillHeight = 0;
+
+  /**
+   * Puts the pill's PILL_ANCHOR point on the PILL_X/PILL_Y target.
+   *
+   * `position` moves the group's origin, which sits at the model's centre — so
+   * the anchor offset is the gap between that centre and the point we actually
+   * want to land, half a pill height at the extremes.
+   */
+  function positionPill() {
+    if (!pillMesh) return;
+    const target = imageToWorld(PILL_X, PILL_Y);
+    pillMesh.position.set(
+      target.x,
+      target.y - pillHeight * (PILL_ANCHOR - 0.5),
+      0
+    );
+  }
   const gltfLoader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
   gltfLoader.load(
@@ -199,7 +259,12 @@ export function initPillScene({
 
       pillMesh = new THREE.Group();
       pillMesh.add(obj);
-      pillMesh.position.copy(screenToWorld(PILL_X, PILL_Y));
+
+      // Measure before any rotation is applied, so the height is the model's
+      // own and not the sweep of its bounding box mid-spin.
+      pillHeight = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3()).y;
+
+      positionPill();
       scene.add(pillMesh);
 
       pillReady = true;
@@ -354,8 +419,10 @@ export function initPillScene({
     bloomComposer.setSize(w * BLOOM_SCALE, h * BLOOM_SCALE);
     finalComposer.setSize(w, h);
 
+    // Order matters: the pill's anchor is derived from the plate's crop, so the
+    // plate has to be refitted first.
     fitBackgroundCover();
-    if (pillMesh) pillMesh.position.copy(screenToWorld(PILL_X, PILL_Y));
+    positionPill();
     if (!running) renderFrame(); // Keep a paused or still scene correct.
   }
   window.addEventListener("resize", onResize, { passive: true });
