@@ -56,7 +56,46 @@ const PILL_Y = 67.8; // the right hand's fingertip height
  * Solved against the model's real bounding box at load, so it stays correct if
  * the model is ever rebuilt at a different size.
  */
-const PILL_ANCHOR = 0.75;
+const PILL_ANCHOR = 0.5;
+
+/**
+ * Glow character — every knob that decides whether the pill reads as *lit from
+ * within* or as *a shiny object catching a lamp*. All of it lives here so the
+ * look can be tuned without hunting through the material, the lights, and the
+ * bloom pass separately.
+ *
+ * The rule of thumb: sharpness comes from tight specular highlights, so soften
+ * by widening the specular lobe (roughness up, clearcoat down) and letting the
+ * bloom do the work instead (low threshold, wide radius).
+ */
+const GLOW = {
+  /** Width of the specular lobe. Low values give a hard mirror streak. */
+  roughness: 0.45,
+  /**
+   * The glossy varnish coat. This is the main source of the sharp highlight —
+   * it sits on top of the base material with its own, much tighter, specular.
+   */
+  clearcoat: 0.3,
+  clearcoatRoughness: 0.6,
+  /** Soft velvet falloff at the silhouette. Diffuse by nature, so safe to lean on. */
+  sheen: 0.85,
+  /** Internal emission. Drives the bloom, so this is the glow's real brightness. */
+  emissive: 0.42,
+  /** How far the emission breathes either side of that. */
+  emissivePulse: 0.08,
+  /** Intensity of the white rim light — the other source of a hard edge. */
+  rimLight: 1.1,
+  /** Violet key light. */
+  keyLight: 3.2,
+  /**
+   * Bloom. A low threshold pulls the pill's mid-tones into the halo (rather
+   * than just its hottest pixels) and a wide radius spreads them, which is
+   * what turns a hot core into an atmospheric glow.
+   */
+  bloomStrength: 0.9,
+  bloomRadius: 0.58,
+  bloomThreshold: 0.2,
+} as const;
 
 export function initPillScene({
   canvas,
@@ -166,11 +205,11 @@ export function initPillScene({
 
   // -- Lighting: violet key, ember fill, white rim, violet back --
   const ambient = new THREE.AmbientLight(0xffffff, 0.2);
-  const keyLight = new THREE.DirectionalLight(0x9d4edd, 4);
+  const keyLight = new THREE.DirectionalLight(0x9d4edd, GLOW.keyLight);
   keyLight.position.set(-3, 2, 3);
   const fillLight = new THREE.DirectionalLight(0xff8c42, 1.1);
   fillLight.position.set(3, -1, 3);
-  const rimLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  const rimLight = new THREE.DirectionalLight(0xffffff, GLOW.rimLight);
   rimLight.position.set(0, 3, -4);
   const backLight = new THREE.DirectionalLight(0x6a0dad, 2.5);
   backLight.position.set(0, -2, -3);
@@ -181,13 +220,13 @@ export function initPillScene({
   const pillMaterial = new THREE.MeshPhysicalMaterial({
     color: 0xe8dcff,
     metalness: 0.0,
-    roughness: 0.28,
+    roughness: GLOW.roughness,
     ior: 1.45,
     emissive: 0x7c4dff,
-    emissiveIntensity: 0.35,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.25,
-    sheen: 0.6,
+    emissiveIntensity: GLOW.emissive,
+    clearcoat: GLOW.clearcoat,
+    clearcoatRoughness: GLOW.clearcoatRoughness,
+    sheen: GLOW.sheen,
     sheenColor: new THREE.Color(0xffa060),
   });
 
@@ -284,9 +323,9 @@ export function initPillScene({
   bloomComposer.addPass(
     new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth * BLOOM_SCALE, window.innerHeight * BLOOM_SCALE),
-      0.85, // strength
-      0.6, // radius
-      0.35 // threshold
+      GLOW.bloomStrength,
+      GLOW.bloomRadius,
+      GLOW.bloomThreshold
     )
   );
 
@@ -356,7 +395,7 @@ export function initPillScene({
     if (!prefersReducedMotion) {
       if (pillMesh) pillMesh.rotation.y = t * 0.8;
       // Breathing emissive: the bloom follows it, so the glow is dynamic.
-      pillMaterial.emissiveIntensity = 0.32 + Math.sin(t * 1.2) * 0.1;
+      pillMaterial.emissiveIntensity = GLOW.emissive + Math.sin(t * 1.2) * GLOW.emissivePulse;
     }
 
     scene.traverse(darkenNonBloomed);
