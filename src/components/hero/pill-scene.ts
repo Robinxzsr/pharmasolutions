@@ -83,8 +83,13 @@ const GLOW = {
   emissive: 0.42,
   /** How far the emission breathes either side of that. */
   emissivePulse: 0.08,
-  /** Intensity of the white rim light — the other source of a hard edge. */
-  rimLight: 1.1,
+  /** Intensity of the white rim light — the main source of the white-hot core. */
+  rimLight: 0.6,
+  /**
+   * The pill's own surface colour. Kept lavender rather than near-white so it
+   * still reads as violet under direct light, instead of blowing out white.
+   */
+  surfaceColor: 0xd9c4ff,
   /** Violet key light. */
   keyLight: 3.2,
   /**
@@ -218,7 +223,7 @@ export function initPillScene({
 
   // -- Pill material: emissive drives the bloom --
   const pillMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xe8dcff,
+    color: GLOW.surfaceColor,
     metalness: 0.0,
     roughness: GLOW.roughness,
     ior: 1.45,
