@@ -1,17 +1,14 @@
 ---
 /**
- * Home — the 3D hero, then a sequence of dark bands.
+ * Home — the 3D hero, then straight into the footer.
  *
- * Structure only below the hero: each Section marks where a block goes and
- * what copy sits on it. Final styling lands in the design pass.
+ * The footer's first band is the "Stay in the loop" capture (see
+ * Footer.astro), so keeping this page to just the hero puts that section
+ * directly beneath it, with no placeholder content between them.
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/hero/Hero.astro";
 import HeroPreload from "../components/hero/HeroPreload.astro";
-import Section from "../components/ui/Section.astro";
-import Container from "../components/ui/Container.astro";
-import Button from "../components/ui/Button.astro";
-import Reveal from "../components/ui/Reveal.astro";
 import { site } from "../lib/site";
 ---
 
@@ -22,49 +19,7 @@ import { site } from "../lib/site";
   <Hero
     heading="Enhance or be left behind"
     subheading="Personalized pharmacology for those who know the world is theirs for the taking"
-    ctaLabel="Begin your journey"
-    ctaHref="/enrol"
+    primaryCta={{ label: "Protocols", href: "/protocols" }}
+    secondaryCta={{ label: "Coaching", href: "/coaching" }}
   />
-
-  {/* The band directly under the hero carries the bloom's spill. */}
-  <Section glow="top">
-    <Container>
-      <Reveal>
-        <h2 class="text-[length:var(--text-display-md)]">Why most pharmacology fails you</h2>
-      </Reveal>
-    </Container>
-  </Section>
-
-  <Section space="md" divider>
-    <Container>
-      <Reveal>
-        <h2 class="text-[length:var(--text-display-md)]">How the coaching works</h2>
-      </Reveal>
-    </Container>
-  </Section>
-
-  <Section ground="raised" space="md">
-    <Container>
-      <Reveal>
-        <h2 class="text-[length:var(--text-display-md)]">Inside the protocols</h2>
-      </Reveal>
-    </Container>
-  </Section>
-
-  <Section space="md">
-    <Container>
-      <Reveal>
-        <h2 class="text-[length:var(--text-display-md)]">What clients say</h2>
-      </Reveal>
-    </Container>
-  </Section>
-
-  <Section glow="center" space="lg">
-    <Container class="text-center">
-      <Reveal>
-        <h2 class="text-[length:var(--text-display-lg)]">Ready to start?</h2>
-        <Button href="/enrol" variant="glow" size="lg" class="mt-10">Begin your journey</Button>
-      </Reveal>
-    </Container>
-  </Section>
 </BaseLayout>

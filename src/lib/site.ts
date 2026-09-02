@@ -24,12 +24,11 @@ export type NavLink = {
   primary?: boolean;
 };
 
-/** Header navigation. Mirrors the hero prototype's IA. */
+/** Header navigation. */
 export const primaryNav: NavLink[] = [
   { label: "Protocols", href: "/protocols" },
   { label: "Coaching", href: "/coaching" },
   { label: "Blog", href: "/blog" },
-  { label: "Get started", href: "/enrol", primary: true },
 ];
 
 /**

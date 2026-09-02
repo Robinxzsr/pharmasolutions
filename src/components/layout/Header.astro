@@ -3,17 +3,20 @@
  * Header — transparent overlay nav, floating over the hero.
  *
  * A 1fr / auto / 1fr grid rather than space-between: with flanking items of
- * different widths, space-between does NOT actually centre the middle item.
+ * different widths (or one side empty), space-between does NOT actually
+ * centre the middle item — the grid does, regardless of how lopsided the
+ * outer columns are.
+ *
+ * Text is set in NeueBit rather than bold Mondwest: Mondwest has no true
+ * bold weight, so asking for it synthesises (faux-bolds) the face, which
+ * smears a pixel typeface. NeueBit is the only face here with a real bold
+ * cut — the same reasoning Button.astro uses for its label.
  */
-import Button from "../ui/Button.astro";
 import { primaryNav, site } from "../../lib/site";
 
 const currentPath = Astro.url.pathname;
 const isActive = (href: string) =>
   href === "/" ? currentPath === "/" : currentPath.startsWith(href);
-
-const links = primaryNav.filter((l) => !l.primary);
-const cta = primaryNav.find((l) => l.primary);
 ---
 
 <header class="absolute inset-x-0 top-0 z-50">
@@ -23,19 +26,19 @@ const cta = primaryNav.find((l) => l.primary);
   >
     <a
       href="/"
-      class="justify-self-start text-[clamp(15px,1.35vw,21px)] leading-none tracking-[-0.01em] text-chalk"
+      class="justify-self-start font-display text-[clamp(15px,1.35vw,21px)] font-bold leading-none tracking-[-0.01em] text-chalk"
     >
       {site.name}
     </a>
 
-    <ul class="glass hidden items-center gap-0.5 justify-self-center rounded-pill px-[7px] py-[5px] md:flex">
+    <ul class="glass hidden items-center gap-0.5 justify-self-center rounded-pill p-[5px] md:flex">
       {
-        links.map((link) => (
+        primaryNav.map((link) => (
           <li>
             <a
               href={link.href}
               aria-current={isActive(link.href) ? "page" : undefined}
-              class="inline-flex items-center justify-center whitespace-nowrap rounded-pill px-[17px] py-[9px] text-[length:var(--text-ui)] leading-none text-content-muted transition-[color,background] duration-[var(--duration-ui)] hover:bg-white/[0.09] hover:text-chalk aria-[current=page]:text-chalk"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-pill px-[17px] py-[9px] font-display text-[length:var(--text-ui)] font-bold leading-none text-content-muted transition-[color,background] duration-[var(--duration-ui)] hover:bg-white/[0.09] hover:text-chalk aria-[current=page]:text-chalk"
             >
               {link.label}
             </a>
@@ -44,9 +47,7 @@ const cta = primaryNav.find((l) => l.primary);
       }
     </ul>
 
-    <div class="flex items-center gap-3 justify-self-end">
-      {cta && <Button href={cta.href} variant="primary" size="sm" class="font-body font-normal">{cta.label}</Button>}
-
+    <div class="flex items-center justify-self-end">
       <button
         type="button"
         class="text-chalk md:hidden"
@@ -65,9 +66,9 @@ const cta = primaryNav.find((l) => l.primary);
   <div id="mobile-nav" hidden class="md:hidden">
     <ul class="flex flex-col gap-4 px-[18px] pb-8">
       {
-        links.map((link) => (
+        primaryNav.map((link) => (
           <li>
-            <a href={link.href} class="text-lg text-chalk">
+            <a href={link.href} class="font-display text-lg font-bold text-chalk">
               {link.label}
             </a>
           </li>
