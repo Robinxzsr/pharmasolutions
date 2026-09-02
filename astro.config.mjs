@@ -5,6 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import node from "@astrojs/node";
+import precompress from "./integrations/precompress.mjs";
+import modulePreload from "./integrations/module-preload.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,7 +22,14 @@ export default defineConfig({
 
   adapter: node({ mode: "standalone" }),
 
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap(),
+    // Emits the modulepreload for the content-hashed three.js chunk.
+    modulePreload(),
+    // Must stay last: it compresses whatever the earlier hooks produced.
+    precompress(),
+  ],
 
   vite: {
     plugins: [tailwindcss()],

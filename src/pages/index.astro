@@ -7,6 +7,7 @@
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/hero/Hero.astro";
+import HeroPreload from "../components/hero/HeroPreload.astro";
 import Section from "../components/ui/Section.astro";
 import Container from "../components/ui/Container.astro";
 import Button from "../components/ui/Button.astro";
@@ -15,6 +16,9 @@ import { site } from "../lib/site";
 ---
 
 <BaseLayout title="Home" description={site.description}>
+  {/* Starts the plate and the model downloading from the initial HTML. */}
+  <HeroPreload slot="head" />
+
   <Hero
     heading="Enhance or be left behind"
     subheading="Personalized pharmacology for those who know the world is theirs for the taking"

@@ -1,0 +1,27 @@
+---
+/**
+ * Head hints for the hero's critical assets.
+ *
+ * Rendered into BaseLayout's `head` slot by the home page. Without these the
+ * hero loads as a strict serial chain — the parser finds the hero script, the
+ * script pulls three.js, and only once three.js has parsed and run does the
+ * GLTFLoader start fetching the model. Each fetch waits a full round trip on
+ * the one before it.
+ *
+ * These hints let the browser start all three downloads from the initial HTML
+ * instead, so the model arrives in parallel with the library rather than after
+ * it. The `modulepreload` for three.js itself is injected at build time (see
+ * `integrations/module-preload.mjs`) because its filename is content-hashed.
+ *
+ * `crossorigin` is required on the model hint: GLTFLoader fetches it in CORS
+ * mode, and a preload whose mode doesn't match is discarded and re-fetched.
+ */
+import heroBg from "../../assets/hero/hero-bg.webp";
+import pillModel from "../../assets/hero/pill.glb?url";
+---
+
+{/* The plate is the first thing painted, so it gets the highest priority. */}
+<link rel="preload" as="image" href={heroBg.src} fetchpriority="high" />
+
+{/* Pulled out from behind three.js. */}
+<link rel="preload" as="fetch" href={pillModel} type="model/gltf-binary" crossorigin />

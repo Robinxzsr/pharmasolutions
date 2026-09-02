@@ -97,6 +97,38 @@ Changes made when porting from the standalone prototype:
 The model is pre-centred and normalised at build time, which is why it spins on its
 own axis with no runtime bounding-box maths.
 
+### Hero load performance
+
+The hero's assets used to load as a strict serial chain: the parser found the
+hero script, the script pulled three.js, and only once three.js had parsed and
+executed did GLTFLoader start fetching the model. Each fetch cost a full round
+trip waiting on the one before it. Two things fix that.
+
+**Preload hints.** `HeroPreload.astro` renders into BaseLayout's `head` slot
+from the home page only, so pages without the hero don't pay for it. It hints
+the plate (`as="image"`, high priority) and the model (`as="fetch"`, with
+`crossorigin` to match GLTFLoader's CORS mode — a mismatched preload is
+discarded and re-fetched). The `modulepreload` for three.js is injected at build
+time by `integrations/module-preload.mjs`, because the chunk is content-hashed
+and its filename only exists once Rollup has written the bundle.
+
+Measured on the production build, all four critical assets now start together at
+~188ms instead of chaining out to 381ms, and the model lands at 212ms instead of
+378ms.
+
+**Compression.** `integrations/precompress.mjs` writes `.br` and `.gz` siblings
+for every compressible asset at build time — quality 11, which is affordable
+once per build but not once per request. It matters most for the three.js chunk:
+643 KB raw, 131 KB brotli.
+
+> **Deployment note.** Static hosts and CDNs (Netlify, Vercel, Cloudflare) and
+> web servers with `brotli_static` / `gzip_static` (nginx, Caddy) serve those
+> files automatically. The `@astrojs/node` **standalone server does not** — it
+> serves assets uncompressed. Behind a CDN or reverse proxy that is fine.
+> Exposing the standalone server directly to the internet is the one deployment
+> where the precompressed files go unused, and it needs a compressing proxy in
+> front, or the adapter switched to `middleware` mode with a custom server.
+
 ### Content
 
 Everything repeatable lives in `src/content/` as typed collections
