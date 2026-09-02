@@ -80,7 +80,7 @@ const GLOW = {
   /** Soft velvet falloff at the silhouette. Diffuse by nature, so safe to lean on. */
   sheen: 0.85,
   /** Internal emission. Drives the bloom, so this is the glow's real brightness. */
-  emissive: 0.42,
+  emissive: 0.37,
   /** How far the emission breathes either side of that. */
   emissivePulse: 0.08,
   /** Intensity of the white rim light — the other source of a hard edge. */
@@ -94,7 +94,7 @@ const GLOW = {
    */
   bloomStrength: 0.9,
   bloomRadius: 0.58,
-  bloomThreshold: 0.2,
+  bloomThreshold: 0.24,
 } as const;
 
 export function initPillScene({
