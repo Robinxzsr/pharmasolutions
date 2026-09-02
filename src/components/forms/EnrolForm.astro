@@ -10,7 +10,8 @@ interface Props {
 }
 const { class: className = "" } = Astro.props;
 
-const field = "w-full rounded-soft border border-ink-900/20 bg-surface px-4 py-3 focus:outline-none";
+const field =
+  "w-full rounded-soft border border-border bg-surface-raised px-4 py-3 text-chalk placeholder:text-content-faint focus:outline-none";
 const label = "block text-sm font-medium";
 ---
 
@@ -55,12 +56,12 @@ const label = "block text-sm font-medium";
 
   <button
     type="submit"
-    class="self-start rounded-pill bg-ink-900 px-8 py-4 text-cream-50 transition-colors hover:bg-ink-700 disabled:opacity-50"
+    class="self-start rounded-pill bg-violet-500 px-8 py-4 font-display font-bold text-chalk shadow-[var(--shadow-glow-sm)] transition-colors duration-[var(--duration-ui)] hover:bg-violet-400 disabled:opacity-50"
   >
     Submit application
   </button>
 
-  <p data-enrol-status role="status" aria-live="polite" class="min-h-5 text-sm"></p>
+  <p data-enrol-status role="status" aria-live="polite" class="min-h-5 text-sm text-content-muted"></p>
 </form>
 
 <script>

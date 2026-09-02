@@ -6,29 +6,38 @@
  * /api/checkout, which re-validates it server-side before charging.
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Scene from "../components/scene/Scene.astro";
+import Section from "../components/ui/Section.astro";
 import Container from "../components/ui/Container.astro";
 import { getCollection } from "astro:content";
 
 const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout title="Pricing" description="Coaching plans for the Pharmasolutions program.">
-  <Scene ground="sky" align="end" class="pt-32 pb-20">
+<BaseLayout title="Pricing" description="Coaching plans and protocol access.">
+  <Section space="md" glow="top" class="pt-40">
     <Container>
-      <h1 class="text-[length:var(--text-display-lg)] text-cream-50">Pricing</h1>
+      <h1 class="text-[length:var(--text-display-lg)]">Pricing</h1>
     </Container>
-  </Scene>
+  </Section>
 
-  <Scene ground="cream">
-    <Container class="py-24">
+  <Section space="md">
+    <Container>
       <div class="grid gap-6 md:grid-cols-3">
         {
           plans.map((plan) => (
-            <article class="flex flex-col rounded-card bg-surface p-8 shadow-sm">
-              <h2 class="font-display text-2xl">{plan.data.name}</h2>
+            <article
+              class:list={[
+                "flex flex-col rounded-card border p-8",
+                plan.data.highlighted
+                  ? "border-violet-500/50 bg-surface-raised shadow-[var(--shadow-glow-sm)]"
+                  : "border-border bg-surface-raised",
+              ]}
+            >
+              <h2 class="text-[length:var(--text-display-sm)]">{plan.data.name}</h2>
               <p class="mt-2 text-content-muted">{plan.data.blurb}</p>
-              <p class="mt-6 text-[length:var(--text-display-sm)]">{plan.data.priceDisplay}</p>
+              <p class="mt-6 text-[length:var(--text-display-sm)] text-brand-soft">
+                {plan.data.priceDisplay}
+              </p>
 
               <ul class="mt-6 flex flex-col gap-2 text-content-muted">
                 {plan.data.features.map((feature) => (
@@ -39,7 +48,13 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
               <button
                 type="button"
                 data-checkout={plan.data.stripePriceId}
-                class="mt-8 rounded-pill bg-ink-900 px-6 py-3 text-cream-50 transition-colors hover:bg-ink-700 disabled:opacity-50"
+                class:list={[
+                  "mt-8 rounded-pill px-6 py-3 font-display font-bold transition-[background-color,opacity]",
+                  "duration-[var(--duration-ui)] disabled:opacity-50",
+                  plan.data.highlighted
+                    ? "bg-violet-500 text-chalk hover:bg-violet-400"
+                    : "bg-chalk text-void-950 hover:opacity-[0.88]",
+                ]}
               >
                 Choose {plan.data.name}
               </button>
@@ -48,9 +63,9 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
         }
       </div>
 
-      <p data-checkout-status role="status" aria-live="polite" class="mt-6 min-h-5 text-sm"></p>
+      <p data-checkout-status role="status" aria-live="polite" class="mt-6 min-h-5 text-sm text-content-muted"></p>
     </Container>
-  </Scene>
+  </Section>
 </BaseLayout>
 
 <script>

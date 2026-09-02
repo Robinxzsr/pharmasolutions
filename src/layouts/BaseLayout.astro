@@ -23,7 +23,8 @@ interface Props {
 const { title, description = site.description, ogImage, noindex = false } = Astro.props;
 
 /** Home gets the bare brand name; everything else is suffixed. */
-const pageTitle = Astro.url.pathname === "/" ? `${site.name} — ${site.tagline}` : `${title} · ${site.name}`;
+const pageTitle =
+  Astro.url.pathname === "/" ? `${site.name} — ${site.tagline}` : `${title} · ${site.name}`;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
 const socialImage = new URL(ogImage ?? "/og-default.png", Astro.site ?? site.url);
@@ -34,6 +35,8 @@ const socialImage = new URL(ogImage ?? "/og-default.png", Astro.site ?? site.url
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="canonical" href={canonical} />
@@ -52,16 +55,17 @@ const socialImage = new URL(ogImage ?? "/og-default.png", Astro.site ?? site.url
     <meta name="twitter:card" content="summary_large_image" />
 
     {/* Emits @font-face + preload links for the self-hosted families. */}
-    <Font cssVariable="--font-fraunces" preload />
-    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-neuebit" preload />
+    <Font cssVariable="--font-mondwest" preload />
+    <Font cssVariable="--font-inter" />
 
     <slot name="head" />
   </head>
 
-  <body class="bg-surface text-content min-h-dvh">
+  <body class="min-h-dvh bg-surface text-content">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-soft focus:bg-cream-50 focus:px-4 focus:py-2"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-pill focus:bg-chalk focus:px-4 focus:py-2 focus:text-void-950"
     >
       Skip to content
     </a>

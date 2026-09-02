@@ -7,14 +7,14 @@
  */
 
 export const site = {
-  name: "Pharmasolutions",
-  tagline: "Pharmacology coaching that makes the mechanism click.",
+  name: "pharmacology.solutions",
+  tagline: "Enhance or be left behind",
   description:
-    "A guided pharmacology coaching program for students and clinicians — built around mechanisms, not memorisation.",
+    "Personalized pharmacology coaching for those who know the world is theirs for the taking.",
   /** Absolute origin. Used by canonical URLs, OG tags, and the sitemap. */
-  url: "https://pharmasolutions.example.com",
+  url: "https://pharmacology.solutions",
   locale: "en_GB",
-  email: "hello@pharmasolutions.example.com",
+  email: "hello@pharmacology.solutions",
 } as const;
 
 export type NavLink = {
@@ -24,27 +24,26 @@ export type NavLink = {
   primary?: boolean;
 };
 
-/** Header navigation. */
+/** Header navigation. Mirrors the hero prototype's IA. */
 export const primaryNav: NavLink[] = [
-  { label: "Program", href: "/program" },
-  { label: "Curriculum", href: "/curriculum" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Resources", href: "/blog" },
-  { label: "Enrol", href: "/enrol", primary: true },
+  { label: "Protocols", href: "/protocols" },
+  { label: "Coaching", href: "/coaching" },
+  { label: "Blog", href: "/blog" },
+  { label: "Get started", href: "/enrol", primary: true },
 ];
 
 /**
- * Footer link groups. The reference design uses four columns — keep this
- * array at four entries unless the footer layout changes with it.
+ * Footer link groups. The layout assumes four columns — keep this array at
+ * four entries unless the footer grid changes with it.
  */
 export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
     heading: "Program",
     links: [
-      { label: "Overview", href: "/program" },
+      { label: "Protocols", href: "/protocols" },
+      { label: "Coaching", href: "/coaching" },
       { label: "Curriculum", href: "/curriculum" },
       { label: "Pricing", href: "/pricing" },
-      { label: "Enrol", href: "/enrol" },
     ],
   },
   {
@@ -58,7 +57,7 @@ export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
     heading: "Resources",
     links: [
-      { label: "Articles", href: "/blog" },
+      { label: "Blog", href: "/blog" },
       { label: "FAQ", href: "/faq" },
     ],
   },

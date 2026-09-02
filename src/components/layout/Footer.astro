@@ -1,12 +1,9 @@
 ---
 /**
- * Footer — the illustrated closing scene.
- *
- * In the reference this is not a plain footer: it is the final Scene band,
- * carrying nav columns over the sky and the newsletter capture over the
- * field. The artwork slots are left empty until illustrations land.
+ * Footer — four nav columns over the void, with the newsletter capture
+ * sitting in a violet wash that echoes the hero's bloom.
  */
-import Scene from "../scene/Scene.astro";
+import Section from "../ui/Section.astro";
 import Container from "../ui/Container.astro";
 import NewsletterForm from "../forms/NewsletterForm.astro";
 import { footerNav, socials, site } from "../../lib/site";
@@ -15,14 +12,22 @@ const year = new Date().getFullYear();
 ---
 
 <footer>
-  {/* Upper band — nav over sky. */}
-  <Scene ground="sky" class="pt-16">
-    {/* <SceneLayer slot="layers" src={ridge} depth="far" /> */}
+  <Section space="md" glow="center" divider>
     <Container width="wide">
-      <div class="grid gap-10 pb-24 md:grid-cols-[1.4fr_repeat(4,1fr)]">
+      <div class="grid items-center gap-10 pb-20 md:grid-cols-2">
+        <div>
+          <h2 class="text-[length:var(--text-display-md)]">Stay in the loop</h2>
+          <p class="mt-3 max-w-sm text-content-muted">
+            Occasional notes on pharmacology, plus first access to new cohorts.
+          </p>
+        </div>
+        <NewsletterForm class="max-w-md md:justify-self-end" />
+      </div>
+
+      <div class="grid gap-10 border-t border-border pt-16 md:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div class="max-w-xs">
-          <p class="font-display text-2xl text-cream-50">{site.name}</p>
-          <p class="mt-3 text-cream-50/80">{site.tagline}</p>
+          <p class="text-[clamp(15px,1.35vw,21px)] text-chalk">{site.name}</p>
+          <p class="mt-3 text-content-muted">{site.tagline}</p>
 
           <ul class="mt-6 flex gap-3">
             {
@@ -31,10 +36,12 @@ const year = new Date().getFullYear();
                   <a
                     href={s.href}
                     rel="me noopener"
-                    class="grid size-10 place-items-center rounded-pill bg-cream-50/15 text-cream-50 transition-colors hover:bg-cream-50/25"
+                    class="glass grid size-10 place-items-center rounded-pill text-content-muted transition-colors hover:text-chalk"
                   >
                     <span class="sr-only">{s.label}</span>
-                    <span aria-hidden="true" class="text-sm">{s.label.slice(0, 2)}</span>
+                    <span aria-hidden="true" class="text-xs">
+                      {s.label.slice(0, 2)}
+                    </span>
                   </a>
                 </li>
               ))
@@ -45,13 +52,13 @@ const year = new Date().getFullYear();
         {
           footerNav.map((group) => (
             <nav aria-label={group.heading}>
-              <h2 class="font-display text-lg text-cream-50">{group.heading}</h2>
+              <h3 class="text-[length:var(--text-display-sm)] text-chalk">{group.heading}</h3>
               <ul class="mt-4 flex flex-col gap-2.5">
                 {group.links.map((link) => (
                   <li>
                     <a
                       href={link.href}
-                      class="text-cream-50/80 transition-colors hover:text-cream-50"
+                      class="text-content-muted transition-colors hover:text-chalk"
                     >
                       {link.label}
                     </a>
@@ -62,34 +69,16 @@ const year = new Date().getFullYear();
           ))
         }
       </div>
-    </Container>
-  </Scene>
-
-  {/* Lower band — newsletter over field. */}
-  <Scene ground="field">
-    {/* <SceneLayer slot="layers" src={wheatField} depth="near" /> */}
-    <Container width="wide">
-      <div class="grid items-center gap-10 py-20 md:grid-cols-2">
-        <div><!-- Illustration focal point sits here. --></div>
-
-        <div>
-          <h2 class="text-[length:var(--text-display-md)] text-ink-900">Stay in the loop</h2>
-          <p class="mt-3 max-w-sm text-ink-700">
-            Occasional notes on pharmacology teaching, plus first access to new cohorts.
-          </p>
-          <NewsletterForm class="mt-6 max-w-md" />
-        </div>
-      </div>
 
       <div
-        class="flex flex-col gap-4 border-t border-ink-900/15 py-6 text-sm text-ink-700 sm:flex-row sm:items-center sm:justify-between"
+        class="mt-16 flex flex-col gap-4 border-t border-border pt-6 text-sm text-content-faint sm:flex-row sm:items-center sm:justify-between"
       >
-        <p>© {year} {site.name}. All rights reserved.</p>
+        <p>&copy; {year} {site.name}. All rights reserved.</p>
         <ul class="flex gap-6">
-          <li><a href="/legal/privacy" class="hover:text-ink-900">Privacy Policy</a></li>
-          <li><a href="/legal/terms" class="hover:text-ink-900">Terms of Service</a></li>
+          <li><a href="/legal/privacy" class="hover:text-chalk">Privacy Policy</a></li>
+          <li><a href="/legal/terms" class="hover:text-chalk">Terms of Service</a></li>
         </ul>
       </div>
     </Container>
-  </Scene>
+  </Section>
 </footer>

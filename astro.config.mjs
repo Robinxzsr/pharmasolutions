@@ -9,7 +9,7 @@ import node from "@astrojs/node";
 // https://astro.build/config
 export default defineConfig({
   /** Required for canonical URLs, OG tags, and sitemap generation. */
-  site: "https://pharmasolutions.example.com",
+  site: "https://pharmacology.solutions",
 
   /**
    * Static by default — every marketing page prerenders to HTML.
@@ -24,29 +24,67 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    /**
+     * three.js is only pulled in by the hero island. Splitting it into its
+     * own chunk keeps it out of the bundle every other page downloads.
+     */
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => (id.includes("node_modules/three") ? "three" : undefined),
+        },
+      },
+    },
   },
 
   /**
-   * Fonts are downloaded at build time, self-hosted, subsetted, and
-   * preloaded with automatic fallback metrics — no layout shift, no
-   * third-party request. The `cssVariable` names are consumed by the
+   * Fonts are processed at build time, self-hosted, and preloaded with
+   * automatic fallback metrics. The `cssVariable` names are consumed by the
    * `@theme` block in `src/styles/global.css`.
+   *
+   * NOTE: PP NeueBit and PP Mondwest are commercial Pangram Pangram faces.
+   * Serving them publicly requires a web licence — see README.
    */
   fonts: [
     {
-      provider: fontProviders.google(),
-      name: "Fraunces",
-      cssVariable: "--font-fraunces",
-      weights: ["400", "500", "600"],
-      styles: ["normal", "italic"],
-      subsets: ["latin"],
-      fallbacks: ["Georgia", "serif"],
+      provider: fontProviders.local(),
+      name: "PP NeueBit",
+      cssVariable: "--font-neuebit",
+      options: {
+        variants: [
+          {
+            weight: 700,
+            style: "normal",
+            src: ["./src/assets/fonts/ppneuebit-bold.woff2"],
+          },
+        ],
+      },
+      fallbacks: ["ui-monospace", "monospace"],
     },
     {
+      provider: fontProviders.local(),
+      name: "PP Mondwest",
+      cssVariable: "--font-mondwest",
+      options: {
+        variants: [
+          {
+            weight: 400,
+            style: "normal",
+            src: ["./src/assets/fonts/ppmondwest-regular.woff2"],
+          },
+        ],
+      },
+      fallbacks: ["ui-monospace", "monospace"],
+    },
+    {
+      /**
+       * Long-form reading face. The pixel faces are display types — they are
+       * punishing at paragraph length, so articles get a real text face.
+       */
       provider: fontProviders.google(),
       name: "Inter",
       cssVariable: "--font-inter",
-      weights: ["400", "500", "600"],
+      weights: ["400", "500"],
       styles: ["normal"],
       subsets: ["latin"],
       fallbacks: ["system-ui", "sans-serif"],
@@ -54,11 +92,6 @@ export default defineConfig({
   ],
 
   image: {
-    /**
-     * Illustrations are the heaviest asset on this site. AVIF first with a
-     * WebP fallback keeps the painterly gradients smooth at a fraction of
-     * the PNG weight.
-     */
     responsiveStyles: true,
     layout: "constrained",
   },

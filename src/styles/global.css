@@ -2,108 +2,103 @@
 
 /* ==========================================================================
    DESIGN TOKENS
-   Single source of truth for the illustrated-editorial style.
+   Single source of truth for the dark-clinical style.
    Swap values here and the whole site follows — never hardcode a hex in a
    component.
    ========================================================================== */
 
 @theme {
   /* --- Palette -------------------------------------------------------------
-     Sampled from the illustrated reference: a warm sky-to-field gradient with
-     terracotta accents. Each ramp runs light -> deep so scene layers can be
-     stacked with real atmospheric depth.
+     Near-black ground, violet as the active/emissive hue, ember as the warm
+     counter-light. Sampled from the hero's three-point lighting rig so the
+     2D UI and the 3D scene agree on the same colours.
   */
 
-  /* Sky — upper scene bands, hero backdrops */
-  --color-sky-50: #eaf5fc;
-  --color-sky-100: #cbe8f7;
-  --color-sky-200: #a3d6ef;
-  --color-sky-300: #7cc2e4;
-  --color-sky-400: #57aad6;
-  --color-sky-500: #3d90c4;
-  --color-sky-600: #2f74a6;
+  /* Ground — the black the whole site sits on */
+  --color-void-950: #000000;
+  --color-void-900: #060608;
+  --color-void-800: #0d0d12;
+  --color-void-700: #16161d;
+  --color-void-600: #22222c;
+  --color-void-500: #32323f;
 
-  /* Ridge — mid-ground mountains, receding depth planes */
-  --color-ridge-300: #7d9ac9;
-  --color-ridge-400: #5b7db5;
-  --color-ridge-500: #45619b;
-  --color-ridge-600: #344b7c;
-  --color-ridge-700: #26375c;
+  /* Violet — the pill's emissive, the primary accent */
+  --color-violet-200: #e8dcff;
+  --color-violet-300: #c4a8ff;
+  --color-violet-400: #9d4edd;
+  --color-violet-500: #7c4dff;
+  --color-violet-600: #6a0dad;
 
-  /* Field — the golden foreground band; primary brand warmth */
-  --color-field-100: #fdeecb;
-  --color-field-200: #f9d891;
-  --color-field-300: #f4bd57;
-  --color-field-400: #eda52c;
-  --color-field-500: #d98e1f;
-  --color-field-600: #b4711a;
+  /* Ember — the warm rim light; used sparingly as a counterweight */
+  --color-ember-300: #ffb37a;
+  --color-ember-400: #ff8c42;
+  --color-ember-500: #e0662a;
 
-  /* Clay — rooftops, accents, secondary CTA */
-  --color-clay-300: #e08a67;
-  --color-clay-400: #c96745;
-  --color-clay-500: #a94f32;
+  /* Text — pure white down through the alpha steps the hero uses */
+  --color-chalk: #ffffff;
+  --color-chalk-muted: rgb(255 255 255 / 0.56);
+  --color-chalk-faint: rgb(255 255 255 / 0.34);
 
-  /* Neutrals — paper-warm, never pure grey */
-  --color-cream-50: #fefaf1;
-  --color-cream-100: #fdf4e3;
-  --color-cream-200: #f5e9d3;
-  --color-ink-500: #4a5468;
-  --color-ink-700: #2b3654;
-  --color-ink-900: #1a2238;
+  /* Hairlines and glass fills, matching the nav pill */
+  --color-edge: rgb(255 255 255 / 0.10);
+  --color-glass: rgb(255 255 255 / 0.07);
 
   /* --- Semantic aliases ----------------------------------------------------
      Components reference THESE, not the raw ramps above. Re-theming the site
      means repointing this block only.
   */
-  --color-surface: var(--color-cream-50);
-  --color-surface-alt: var(--color-cream-100);
-  --color-content: var(--color-ink-900);
-  --color-content-muted: var(--color-ink-500);
-  --color-content-invert: var(--color-cream-50);
-  --color-brand: var(--color-field-400);
-  --color-brand-deep: var(--color-field-600);
-  --color-accent: var(--color-clay-400);
+  --color-surface: var(--color-void-950);
+  --color-surface-raised: var(--color-void-800);
+  --color-surface-glass: var(--color-glass);
+  --color-content: var(--color-chalk);
+  --color-content-muted: var(--color-chalk-muted);
+  --color-content-faint: var(--color-chalk-faint);
+  --color-brand: var(--color-violet-500);
+  --color-brand-soft: var(--color-violet-300);
+  --color-accent: var(--color-ember-400);
+  --color-border: var(--color-edge);
 
   /* --- Typography ----------------------------------------------------------
-     Two families only. A high-warmth display serif carries every heading;
-     a neutral grotesque handles body copy so the serif keeps its impact.
+     Two pixel display faces carry the brand; a real text face carries the
+     paragraphs. NeueBit is the only true bold available — Mondwest would be
+     synthesised bold, which smears a pixel typeface.
 
-     `--font-fraunces` / `--font-inter` are emitted by the Astro Fonts API
-     (see `fonts` in astro.config.mjs) and already include fallback metrics.
+     `--font-neuebit` / `--font-mondwest` / `--font-inter` are emitted by the
+     Astro Fonts API (see `fonts` in astro.config.mjs).
   */
-  --font-display: var(--font-fraunces);
-  --font-body: var(--font-inter);
+  --font-display: var(--font-neuebit);
+  --font-body: var(--font-mondwest);
+  --font-prose: var(--font-inter);
 
-  /* Fluid display scale — clamp() so oversized headings survive mobile */
-  --text-display-xl: clamp(3rem, 8vw, 6.5rem);
-  --text-display-lg: clamp(2.5rem, 6vw, 4.5rem);
-  --text-display-md: clamp(2rem, 4.5vw, 3rem);
-  --text-display-sm: clamp(1.5rem, 3vw, 2rem);
+  /* Fluid display scale — clamp() so oversized headings survive mobile.
+     Values carried over from the hero prototype. */
+  --text-display-xl: clamp(40px, 5.4vw, 88px);
+  --text-display-lg: clamp(34px, 4.2vw, 64px);
+  --text-display-md: clamp(26px, 3vw, 44px);
+  --text-display-sm: clamp(20px, 2vw, 30px);
+  --text-ui: clamp(11px, 0.88vw, 14px);
 
   /* --- Shape ---------------------------------------------------------------
-     The reference leans on fully-rounded pills for inputs and buttons, with
-     soft rounding elsewhere. Nothing is sharp.
+     Fully-rounded pills for every interactive control, soft rounding for
+     panels. Nothing is sharp.
   */
   --radius-soft: 0.75rem;
   --radius-card: 1.25rem;
   --radius-pill: 999px;
 
   /* --- Motion --------------------------------------------------------------
-     Slow, eased, painterly. Never bouncy.
+     Quick on UI, slow and deliberate on reveals. Never bouncy.
   */
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-reveal: 900ms;
-  --duration-ui: 220ms;
+  --duration-reveal: 700ms;
+  --duration-ui: 200ms;
 
-  /* --- Scene depth ---------------------------------------------------------
-     Parallax layers read back-to-front. Kept as tokens so a Scene can declare
-     depth semantically instead of guessing z-index numbers.
+  /* --- Glow ----------------------------------------------------------------
+     The 2D echo of the hero's bloom pass, so buttons and panels sit in the
+     same light as the 3D scene.
   */
-  --z-scene-sky: 0;
-  --z-scene-far: 10;
-  --z-scene-mid: 20;
-  --z-scene-near: 30;
-  --z-scene-content: 40;
+  --shadow-glow-sm: 0 0 24px -6px rgb(124 77 255 / 0.45);
+  --shadow-glow-lg: 0 0 80px -12px rgb(124 77 255 / 0.55);
 }
 
 /* ==========================================================================
@@ -113,12 +108,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Scene bands butt directly against each other — kill subpixel seams. */
     background-color: var(--color-surface);
     color: var(--color-content);
     font-family: var(--font-body);
+    /* Pixel faces must NOT be antialiased into mush — keep the edges hard. */
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
   }
 
   h1,
@@ -126,10 +120,9 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.015em;
-    /* Fraunces optical sizing: large headings get higher contrast strokes. */
-    font-variation-settings: "SOFT" 40, "WONK" 1;
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: 0.005em;
     text-wrap: balance;
   }
 
@@ -155,48 +148,50 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-ink-900);
+    outline: 2px solid var(--color-brand-soft);
     outline-offset: 3px;
-    border-radius: var(--radius-soft);
+    border-radius: var(--radius-pill);
+  }
+
+  ::selection {
+    background: var(--color-violet-500);
+    color: var(--color-chalk);
   }
 }
 
 /* ==========================================================================
    UTILITIES
-   Style-specific primitives that Tailwind has no equivalent for.
+   Style-specific primitives Tailwind has no equivalent for.
    ========================================================================== */
 
-@utility grain {
-  /* Painterly tooth. Sits above the artwork, below the content, and is
-     pointer-transparent so it never eats clicks. */
-  position: relative;
-  isolation: isolate;
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.28;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  }
+@utility glass {
+  /* The frosted capsule used by the nav and any floating control. */
+  background: var(--color-surface-glass);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 @utility full-bleed {
-  /* Escapes any centred container to span the viewport — scene bands must
-     always touch both edges. */
+  /* Escapes any centred container to span the viewport. */
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
 }
 
+@utility prose-body {
+  /* Long-form article copy: real text face, comfortable measure. */
+  font-family: var(--font-prose);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-content-muted);
+}
+
 @utility reveal-hidden {
-  /* Paired with Reveal.astro. Declared in CSS (not inline) so content is
+  /* Paired with Reveal.astro. Declared in CSS (not inline) so content stays
      visible if JS never runs. */
   opacity: 0;
-  transform: translateY(1.5rem);
+  transform: translateY(1.25rem);
 }
 
 @utility reveal-shown {

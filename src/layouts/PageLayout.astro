@@ -2,12 +2,12 @@
 /**
  * PageLayout — standard content page.
  *
- * Wraps BaseLayout with a titled hero band, for pages that are mostly prose
- * (About, FAQ, Legal). Pages that are a bespoke sequence of illustrated
- * Scenes (Home, Pricing) should use BaseLayout directly instead.
+ * Wraps BaseLayout with a titled masthead, for pages that are mostly prose
+ * (About, FAQ, Legal). The home page composes Hero + Sections directly on
+ * BaseLayout instead.
  */
 import BaseLayout from "./BaseLayout.astro";
-import Scene from "../components/scene/Scene.astro";
+import Section from "../components/ui/Section.astro";
 import Container from "../components/ui/Container.astro";
 
 interface Props {
@@ -22,15 +22,16 @@ const { title, description, lede, noindex } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
-  <Scene ground="sky" height="auto" align="end" class="pt-32 pb-20">
-    {/* Hero artwork layers slot in here once illustrations exist. */}
+  <Section space="md" glow="top" class="pt-40">
     <Container>
-      <h1 class="text-[length:var(--text-display-lg)] text-cream-50">{title}</h1>
-      {lede && <p class="mt-5 max-w-xl text-lg text-cream-50/85">{lede}</p>}
+      <h1 class="text-[length:var(--text-display-lg)]">{title}</h1>
+      {lede && <p class="mt-5 max-w-xl text-lg text-content-muted">{lede}</p>}
     </Container>
-  </Scene>
+  </Section>
 
-  <Container width="prose" class="py-20">
-    <slot />
-  </Container>
+  <Section space="md">
+    <Container width="prose" class="prose-body">
+      <slot />
+    </Container>
+  </Section>
 </BaseLayout>

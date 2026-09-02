@@ -1,0 +1,66 @@
+---
+/**
+ * Section — a page band.
+ *
+ * Replaces the illustrated-Scene primitive from the earlier direction. On a
+ * black ground there is no painted artwork to stack, so a band is just a
+ * ground tone, vertical rhythm, and an optional violet glow bleeding in from
+ * the edge to echo the hero's bloom.
+ */
+interface Props {
+  /** `void` is the site ground; `raised` lifts a band slightly out of it. */
+  ground?: "void" | "raised";
+  /** Vertical padding. */
+  space?: "sm" | "md" | "lg";
+  /** Adds a soft violet wash. `top` reads as light spilling from the hero. */
+  glow?: "none" | "top" | "center";
+  /** Hairline rule along the upper edge. */
+  divider?: boolean;
+  id?: string;
+  class?: string;
+}
+
+const {
+  ground = "void",
+  space = "lg",
+  glow = "none",
+  divider = false,
+  id,
+  class: className = "",
+} = Astro.props;
+
+const groundClass = {
+  void: "bg-surface",
+  raised: "bg-surface-raised",
+}[ground];
+
+const spaceClass = {
+  sm: "py-16",
+  md: "py-24",
+  lg: "py-32",
+}[space];
+
+const glowStyle = {
+  none: undefined,
+  top: "radial-gradient(ellipse 60% 40% at 50% 0%, rgb(124 77 255 / 0.16), transparent 70%)",
+  center: "radial-gradient(ellipse 50% 50% at 50% 50%, rgb(124 77 255 / 0.12), transparent 70%)",
+}[glow];
+---
+
+<section
+  id={id}
+  class:list={[
+    "relative isolate w-full",
+    groundClass,
+    spaceClass,
+    divider && "border-t border-border",
+    className,
+  ]}
+>
+  {
+    glowStyle && (
+      <div class="pointer-events-none absolute inset-0 -z-10" style={`background:${glowStyle}`} />
+    )
+  }
+  <slot />
+</section>

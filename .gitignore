@@ -26,3 +26,6 @@ pnpm-debug.log*
 # local env
 .env.local
 .env.*.local
+
+# astro dev --background state
+.astro-dev/

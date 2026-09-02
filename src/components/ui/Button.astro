@@ -2,12 +2,13 @@
 /**
  * Button — renders as <a> when given an href, otherwise <button>.
  *
- * The reference design uses fully-rounded pills throughout, so `--radius-pill`
- * is the only shape here. Variants map to the semantic colour tokens.
+ * Pills everywhere, matching the hero. `primary` is the white capsule from
+ * the prototype's CTA; `glow` is the violet variant for moments that should
+ * sit in the same light as the pill.
  */
 interface Props {
   href?: string;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "glow" | "ghost";
   size?: "sm" | "md" | "lg";
   type?: "button" | "submit";
   disabled?: boolean;
@@ -28,21 +29,22 @@ const {
 const Tag = href ? "a" : "button";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-pill font-medium " +
-  "transition-[background-color,color,transform] duration-[var(--duration-ui)] " +
-  "ease-[var(--ease-out-soft)] motion-safe:active:scale-[0.98] " +
-  "disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-[11px] rounded-pill leading-none " +
+  "transition-[background-color,color,opacity,box-shadow] duration-[var(--duration-ui)] " +
+  "ease-[var(--ease-out-soft)] disabled:pointer-events-none disabled:opacity-50";
 
+/* NeueBit is the only true bold face available — Mondwest would be
+   synthesised (faux) bold, which smears a pixel typeface. */
 const variantClass = {
-  primary: "bg-ink-900 text-cream-50 hover:bg-ink-700",
-  secondary: "bg-field-400 text-ink-900 hover:bg-field-300",
-  ghost: "border border-current/25 text-current hover:bg-current/5",
+  primary: "font-display font-bold bg-chalk text-void-950 hover:opacity-[0.88]",
+  glow: "font-display font-bold bg-violet-500 text-chalk shadow-[var(--shadow-glow-sm)] hover:bg-violet-400",
+  ghost: "font-body border border-border text-content hover:bg-glass",
 }[variant];
 
 const sizeClass = {
-  sm: "px-4 py-2 text-sm",
-  md: "px-6 py-3 text-base",
-  lg: "px-8 py-4 text-lg",
+  sm: "px-6 py-3 text-[length:var(--text-ui)]",
+  md: "px-8 py-3.5 text-[clamp(14px,1.15vw,18px)]",
+  lg: "px-10 py-[18px] text-[clamp(17px,1.45vw,23px)]",
 }[size];
 ---
 

@@ -1,0 +1,166 @@
+---
+/**
+ * Hero — the full-viewport 3D opening.
+ *
+ * The CSS background paints the plate as soon as it decodes, long before
+ * three.js is ready; the canvas later draws the same image with the same
+ * cover-fit on top, so the handoff is invisible. Copy is held back until the
+ * scene has rendered a frame, so the whole hero arrives as one fade.
+ *
+ * Asset URLs are passed as data attributes rather than `define:vars`, because
+ * `define:vars` forces the script inline and it would lose bundling.
+ */
+import heroBg from "../../assets/hero/hero-bg.webp";
+import pillModel from "../../assets/hero/pill.glb?url";
+import Button from "../ui/Button.astro";
+
+interface Props {
+  heading: string;
+  subheading: string;
+  ctaLabel: string;
+  ctaHref: string;
+}
+
+const { heading, subheading, ctaLabel, ctaHref } = Astro.props;
+---
+
+<section class="hero relative h-dvh w-full overflow-hidden">
+  {/* Instant plate — paints before three.js boots. */}
+  <div
+    class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+    style={`background-image:url(${heroBg.src})`}
+  >
+  </div>
+
+  <canvas
+    id="pill-canvas"
+    class="absolute inset-0 z-[1] block opacity-0 transition-opacity duration-[550ms] ease-out"
+    data-bg={heroBg.src}
+    data-model={pillModel}
+    aria-hidden="true"
+  ></canvas>
+
+  {/* Legibility scrim so the copy reads cleanly over the plate. */}
+  <div
+    class="pointer-events-none absolute inset-0 z-[2]"
+    style="background:linear-gradient(to bottom,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.45) 26%,rgba(0,0,0,0.12) 42%,rgba(0,0,0,0) 55%)"
+  >
+  </div>
+
+  <div class="hero-copy absolute left-1/2 top-0 z-10 w-[min(92vw,780px)] -translate-x-1/2 pt-[15.5vh] text-center">
+    <h1 class="text-[length:var(--text-display-xl)] text-chalk">{heading}</h1>
+
+    <p
+      class="mx-auto mt-[clamp(14px,1.9vh,24px)] max-w-[30em] text-[clamp(12px,1.02vw,16px)] leading-[1.62] text-content-muted"
+    >
+      {subheading}
+    </p>
+
+    <Button
+      href={ctaHref}
+      variant="primary"
+      size="lg"
+      class="mt-[clamp(24px,3.8vh,46px)] group"
+    >
+      {ctaLabel}
+      <span
+        class="inline-block leading-none transition-transform duration-[var(--duration-ui)] group-hover:translate-x-[3px]"
+        aria-hidden="true">&#8594;</span
+      >
+    </Button>
+  </div>
+
+  <div
+    class="hero-icons absolute bottom-[5.2vh] left-1/2 z-10 flex -translate-x-1/2 gap-[clamp(14px,1.9vw,30px)]"
+    aria-hidden="true"
+  >
+    <svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M4 20h16"></path></svg>
+    <svg viewBox="0 0 24 24"
+      ><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M4 10h16M10 4v16"></path></svg
+    >
+    <svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg>
+    <svg viewBox="0 0 24 24"
+      ><circle cx="12" cy="12" r="8"></circle><path d="M8 12h8"></path></svg
+    >
+    <svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"></path></svg>
+  </div>
+</section>
+
+<style>
+  /* Copy is held back so it reveals together with the scene rather than
+     appearing first. The scene's own 3s timeout guarantees it always shows. */
+  .hero-copy,
+  .hero-icons {
+    opacity: 0;
+    transition: opacity 0.7s ease 0.12s;
+  }
+
+  :global(body.hero-ready) #pill-canvas,
+  :global(body.hero-ready) .hero-copy {
+    opacity: 1;
+  }
+
+  :global(body.hero-ready) .hero-icons {
+    opacity: 0.5;
+  }
+
+  .hero-icons svg {
+    width: clamp(15px, 1.15vw, 19px);
+    height: clamp(15px, 1.15vw, 19px);
+    stroke: rgb(255 255 255 / 0.85);
+    fill: none;
+    stroke-width: 1.4;
+  }
+
+  @media (max-width: 820px) {
+    .hero-copy {
+      padding-top: 13vh;
+    }
+  }
+</style>
+
+<script>
+  import { initPillScene } from "./pill-scene";
+
+  let teardown: (() => void) | null = null;
+
+  async function initHero() {
+    const canvas = document.getElementById("pill-canvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const { bg, model } = canvas.dataset;
+    if (!bg || !model) return;
+
+    const reveal = () => document.body.classList.add("hero-ready");
+
+    // If WebGL is unavailable, the CSS plate and scrim still carry the hero —
+    // just show the copy and skip the 3D entirely.
+    if (!window.WebGLRenderingContext) {
+      reveal();
+      return;
+    }
+
+    try {
+      teardown = initPillScene({
+        canvas,
+        backgroundUrl: bg,
+        modelUrl: model,
+        onReady: reveal,
+      });
+    } catch (error) {
+      console.error("[hero] scene init failed:", error);
+      reveal();
+    }
+  }
+
+  function destroyHero() {
+    teardown?.();
+    teardown = null;
+    document.body.classList.remove("hero-ready");
+  }
+
+  initHero();
+  // Client-side navigation: tear the old scene down before building a new one.
+  document.addEventListener("astro:before-swap", destroyHero);
+  document.addEventListener("astro:page-load", initHero);
+</script>

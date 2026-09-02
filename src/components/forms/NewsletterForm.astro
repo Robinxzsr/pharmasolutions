@@ -18,7 +18,7 @@ const { class: className = "" } = Astro.props;
   class:list={["w-full", className]}
 >
   <div
-    class="flex items-center gap-2 rounded-pill border border-ink-900/20 bg-cream-50/40 p-1.5 pl-5"
+    class="glass flex items-center gap-2 rounded-pill p-1.5 pl-5"
   >
     <label for="newsletter-email" class="sr-only">Email address</label>
     <input
@@ -28,7 +28,7 @@ const { class: className = "" } = Astro.props;
       required
       autocomplete="email"
       placeholder="Enter your email"
-      class="w-full bg-transparent py-2.5 text-ink-900 placeholder:text-ink-500 focus:outline-none"
+      class="w-full bg-transparent py-2.5 text-chalk placeholder:text-content-faint focus:outline-none"
     />
 
     {/* Honeypot — bots fill it, humans never see it. */}
@@ -43,7 +43,7 @@ const { class: className = "" } = Astro.props;
 
     <button
       type="submit"
-      class="grid size-11 shrink-0 place-items-center rounded-pill bg-cream-50 text-ink-900 transition-colors hover:bg-cream-100"
+      class="grid size-11 shrink-0 place-items-center rounded-pill bg-chalk text-void-950 transition-opacity duration-[var(--duration-ui)] hover:opacity-[0.88]"
     >
       <span class="sr-only">Subscribe</span>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">

@@ -23,7 +23,7 @@ const posts = (await getCollection("blog", ({ data }) => import.meta.env.DEV || 
             })}
           </time>
           <h2 class="mt-1 text-[length:var(--text-display-sm)]">
-            <a href={`/blog/${post.id}`} class="hover:text-accent">{post.data.title}</a>
+            <a href={`/blog/${post.id}`} class="hover:text-brand-soft">{post.data.title}</a>
           </h2>
           <p class="mt-2 text-content-muted">{post.data.description}</p>
         </li>
