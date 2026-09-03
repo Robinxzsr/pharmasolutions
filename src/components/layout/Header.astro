@@ -35,6 +35,15 @@
  * value rather than a hand-matched margin, so they can't drift apart again:
  * the logo and the <nav> are both flex children of the same column, and the
  * <ul> inside <nav> uses the identical gap.
+ *
+ * `position: fixed` (not `absolute`) is what makes this sticky: absolute
+ * anchors to the document, so it scrolled away with the page like any other
+ * element. Fixed pins it to the viewport instead.
+ *
+ * It stays fully transparent at the top of the page — that's what lets it
+ * float over the hero art unframed — and only gains the glass backdrop once
+ * scrolled, so it stays legible over arbitrary page content instead of
+ * floating bare text on top of it with no separation.
  */
 import { primaryNav, site } from "../../lib/site";
 
@@ -43,7 +52,14 @@ const isActive = (href: string) =>
   href === "/" ? currentPath === "/" : currentPath.startsWith(href);
 ---
 
-<header class="absolute inset-x-0 top-0 z-50 px-[18px] py-4 md:px-[34px] md:py-[22px]">
+<header
+  data-sticky-header
+  class:list={[
+    "fixed inset-x-0 top-0 z-50 px-[18px] py-4 md:px-[34px] md:py-[22px]",
+    "border-b border-transparent transition-[background-color,border-color,backdrop-filter] duration-300 ease-out",
+    "data-[scrolled]:bg-surface-glass data-[scrolled]:border-border data-[scrolled]:backdrop-blur-md",
+  ]}
+>
   <div class="flex flex-col items-start gap-0.5">
     <a
       href="/"
@@ -107,3 +123,32 @@ const isActive = (href: string) =>
     </nav>
   </div>
 </header>
+
+<script>
+  /**
+   * Toggles the header's glass backdrop once the page has scrolled past a
+   * small threshold. No ClientRouter/view-transitions is configured in this
+   * project, so every navigation is a full page load — a plain listener
+   * registered once per load is sufficient. The astro:page-load listener is
+   * kept anyway, matching every other component's script in this codebase,
+   * so nothing here needs revisiting if that ever changes.
+   */
+  function initStickyHeader() {
+    const header = document.querySelector<HTMLElement>("[data-sticky-header]");
+    if (!header || header.dataset.stickyBound) return;
+    header.dataset.stickyBound = "true";
+
+    const SCROLLED_THRESHOLD = 8;
+
+    function update() {
+      if (window.scrollY > SCROLLED_THRESHOLD) header!.setAttribute("data-scrolled", "");
+      else header!.removeAttribute("data-scrolled");
+    }
+
+    update(); // Correct immediately for a page that loads already scrolled (e.g. a #hash link).
+    window.addEventListener("scroll", update, { passive: true });
+  }
+
+  initStickyHeader();
+  document.addEventListener("astro:page-load", initStickyHeader);
+</script>
