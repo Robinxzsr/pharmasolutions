@@ -12,7 +12,7 @@ const year = new Date().getFullYear();
 ---
 
 <footer>
-  <Section space="md" glow="center" divider>
+  <Section space="md" divider>
     <Container width="wide">
       <div class="grid items-center gap-10 pb-20 md:grid-cols-2">
         <div>
@@ -36,7 +36,7 @@ const year = new Date().getFullYear();
                   <a
                     href={s.href}
                     rel="me noopener"
-                    class="bitmap grid size-10 place-items-center text-content-muted transition-colors hover:text-chalk [--bitmap-step:2px] [--bitmap-fill:var(--color-void-900)]"
+                    class="glow-hover grid size-10 place-items-center border border-border bg-void-900 text-content-muted hover:border-brand-soft hover:text-chalk focus-visible:border-brand-soft focus-visible:text-chalk"
                   >
                     <span class="sr-only">{s.label}</span>
                     <span aria-hidden="true" class="text-xs">

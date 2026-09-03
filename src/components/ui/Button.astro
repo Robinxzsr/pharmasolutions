@@ -2,15 +2,17 @@
 /**
  * Button — renders as <a> when given an href, otherwise <button>.
  *
- * Cut from the `bitmap` material (see global.css), not the hero pill's glass:
- * corners resolve on the pixel grid instead of a radius. The REST state is
- * the bitmap material; the HOVER state is deliberately the original,
- * un-halftoned interaction — a plain opacity fade on `primary`, a plain
- * colour shift on `glow`/`ghost` — because a growing dot screen on every
- * hover across the whole site turned out to be a lot of buzzing motion for
- * very little payoff. Card hover (ProtocolCard, BlogCard) is the one place
- * that halftone-grow move survives, since there it's revealing a cover image
- * rather than decorating a label.
+ * A plain rectangle: flat fill, 1.5px border, square corners — no radius, no
+ * clip-path. Hover is `glow-hover` (see global.css): the border lifts a
+ * shade and the site's own violet bloom (`--shadow-glow-sm`) appears behind
+ * the box, the same accent language the hero pill already uses, so every
+ * "press this" on the site sits in one light instead of each control
+ * inventing its own.
+ *
+ * Labels are set uppercase with a touch of tracking — the small-caps-style
+ * treatment most CTA buttons use, distinct from the display type's own
+ * tracking (which stays tight; this is a different axis, applied to a
+ * short, all-caps label rather than a sentence).
  */
 interface Props {
   href?: string;
@@ -35,38 +37,25 @@ const {
 const Tag = href ? "a" : "button";
 
 const base =
-  "bitmap group/btn inline-flex items-center justify-center gap-[11px] leading-none " +
-  "font-display font-bold transition-opacity duration-[var(--duration-ui)] " +
+  "inline-flex items-center justify-center gap-[11px] leading-none transition-[background-color,border-color,opacity,box-shadow] " +
+  "duration-[var(--duration-ui)] ease-[var(--ease-out-soft)] font-display font-bold uppercase tracking-[0.04em] border " +
   "disabled:pointer-events-none disabled:opacity-50";
 
 /* NeueBit is the only true bold face available — Mondwest would be
-   synthesised (faux) bold, which smears a pixel typeface. */
+   synthesised (faux) bold, which smears a pixel typeface.
+
+   `glow` is the one variant that glows at rest, not just on hover — the
+   permanent bloom is what marks it as the primary action on a page (enrol,
+   checkout), and hover just steps the whole thing up a shade brighter and
+   the blur wider (`--shadow-glow-lg` in place of `-sm`), rather than using
+   the shared `glow-hover` utility, which would fight this variant's own
+   always-on shadow for which one wins on hover. */
 const variantClass = {
-  /* Original hover was a flat opacity fade — kept verbatim. */
-  primary:
-    "text-void-950 [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] " +
-    "hover:opacity-[0.88] focus-visible:opacity-[0.88]",
-  /* Original hover lightened the fill from violet-500 to violet-400; the
-     bitmap fill can't be transitioned as a flat colour swap the way a
-     Tailwind bg-* class was, so this lightens the ink to the same step
-     instead — same "one shade brighter" read, no dot growth. */
+  primary: "glow-hover border-transparent bg-chalk text-void-950 hover:opacity-[0.88]",
   glow:
-    "text-chalk [--bitmap-ink:var(--color-violet-500)] [--bitmap-fill:var(--color-violet-500)] " +
-    "hover:[--bitmap-ink:var(--color-violet-400)] focus-visible:[--bitmap-ink:var(--color-violet-400)]",
-  /* The fill is a low-alpha black, not fully transparent: the ink is painted
-     by the element itself and the fill layer is what covers it, so a truly
-     transparent fill lets the ink flood the whole face instead of leaving a
-     1px frame. It earns its keep besides — ghost is the variant that sits over
-     the hero's bloom, where white type on bare violet is the weakest contrast
-     on the site, and the wash gives the label a floor. Over the black pages it
-     is invisible, so ghost still reads as outline-only everywhere else.
-     Original hover lightened the border to chalk/55 and washed in a faint
-     white fill — reproduced here as the ink lightening and the fill tinting
-     toward white instead of black. */
-  ghost:
-    "text-chalk [--bitmap-ink:rgb(255_255_255/0.3)] [--bitmap-fill:rgb(0_0_0/0.35)] " +
-    "hover:[--bitmap-ink:rgb(255_255_255/0.55)] hover:[--bitmap-fill:rgb(255_255_255/0.08)] " +
-    "focus-visible:[--bitmap-ink:rgb(255_255_255/0.55)] focus-visible:[--bitmap-fill:rgb(255_255_255/0.08)]",
+    "border-transparent bg-violet-500 text-chalk shadow-[var(--shadow-glow-sm)] " +
+    "hover:bg-violet-400 hover:shadow-[var(--shadow-glow-lg)] focus-visible:bg-violet-400 focus-visible:shadow-[var(--shadow-glow-lg)]",
+  ghost: "glow-hover border-chalk/30 bg-transparent text-chalk hover:border-chalk/55 hover:bg-white/[0.08]",
 }[variant];
 
 const sizeClass = {

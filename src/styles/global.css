@@ -152,10 +152,8 @@
     }
   }
 
-  /* Square ring, not a pill: the focus indicator belongs to the same grid
-     the controls are cut on. Controls using the `bitmap` utility opt out of
-     this and draw focus inside their own clip instead — clip-path would
-     otherwise clip the outline away entirely. */
+  /* Square, not a pill — every control on the site is a plain rectangle,
+     so the focus ring is one too. */
   :focus-visible {
     outline: 2px solid var(--color-brand-soft);
     outline-offset: 3px;
@@ -271,181 +269,97 @@
 }
 
 /* ==========================================================================
-   THE BITMAP MATERIAL
+   THE BOX MATERIAL
    ==========================================================================
 
-   The site has two materials and they are not interchangeable.
+   Every operable control is a plain rectangle: a border, a flat fill, square
+   corners (the pixel-cut stairstep this used to be is retired — a jagged
+   corner reads as an artifact once you sit with it, not a material). No
+   radius, no clip-path, so a real browser focus outline works everywhere
+   again instead of needing a drawn-in-place substitute.
 
-   `glass` + `rounded-pill` + `--shadow-glow-*` belong to the hero's 3D pill:
-   smooth, emissive, floating. That material stays rare and precious — the
-   hero and the nav capsule that floats over it, and nothing else.
+   Two hover languages, chosen by what's being hovered, not stacked onto
+   everything:
 
-   Everything you actually operate — buttons, cards, fields — belongs to the
-   other half of the hero: the halftone plate. That plate is a photograph
-   quantised onto a hard grid of dots, so the controls are built the same way.
-   Tone is carried by dot SIZE, not by opacity or blur, exactly as it is in a
-   real dot screen: a darker patch is the same dots, printed fatter.
+   - `glow-hover`: buttons, fields, chips, tiles — anything you operate. The
+     border lifts a shade and the site's own violet bloom (`--shadow-glow-sm`,
+     defined above — the same one the hero pill and glow buttons already use)
+     appears behind the box. One accent language for every "press this",
+     reused rather than invented per control.
 
-   Applying the pill/glass/glow language to every control was what made the UI
-   read as generic — the precious material stopped being precious. Splitting
-   the two is the whole idea here.
+   - `shine`: cards only. A single bright streak travels once around the
+     frame's perimeter for as long as the card is hovered, the way the
+     reference brief's example site treats its own cards. Cards are the one
+     "look at this" object on the site, so they're the one place that earns
+     motion the buttons don't get.
    ========================================================================== */
 
-/* Registering the dot radius as a real <length> is what lets tone *animate*.
-   An unregistered custom property inside a gradient is a string and snaps
-   between values; registered, the browser interpolates it on the compositor,
-   so a hover genuinely grows the dots instead of cross-fading two screens. */
-@property --dot-r {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 0px;
-}
+@utility glow-hover {
+  transition:
+    border-color var(--duration-ui) var(--ease-out-soft),
+    background-color var(--duration-ui) var(--ease-out-soft),
+    box-shadow var(--duration-ui) var(--ease-out-soft),
+    color var(--duration-ui) var(--ease-out-soft),
+    opacity var(--duration-ui) var(--ease-out-soft);
 
-@layer base {
-  :root {
-    /* One pixel of the control grid. Corners are two of these, so the step
-       stays legible as a step at 3px but never reads as a chamfer. */
-    --bitmap-step: 3px;
-    /* The dot pitch. 4px against the hero plate's 5px: controls are smaller
-       objects, so they carry a slightly finer screen — same plate, closer
-       viewing distance. */
-    --dot-grid: 4px;
+  &:hover,
+  &:focus-visible {
+    box-shadow: var(--shadow-glow-sm);
   }
 }
 
-@utility bitmap {
-  /* A box whose corners resolve on the pixel grid: a curve drawn at low
-     resolution rather than a smooth one. Two 1px-ish steps per corner.
+/* Registering the angle as a real <angle> is what lets it animate on its
+   own timeline (the @keyframes below) rather than needing JS to drive a
+   requestAnimationFrame loop. */
+@property --shine-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 
-     Built as ink-behind-fill rather than `border` + `border-radius` because
-     a border follows the border box, not the clip — the staircase corners
-     would lose their outline. The element itself paints the ink; ::before
-     paints the fill inset by the ink width, under the same clip path. Both
-     read the clip from a custom property so the percentages resolve against
-     each box's own size.
+@keyframes shine-rotate {
+  to {
+    --shine-angle: 360deg;
+  }
+}
 
-     Consequence worth knowing: clip-path clips a focus outline away too, so
-     focus here is drawn INSIDE, by thickening and lighting the ink. See
-     :focus-visible below. */
-  --bitmap-fill: var(--color-surface);
-  --bitmap-ink: var(--color-border);
-  --bitmap-ink-w: 1px;
-  --bitmap-dot: transparent;
-  /* --dot-r has to inherit for ::before to read it, which means a bitmap box
-     nested inside a screened one would silently pick up its parent's tone —
-     the footer's subscribe tile inside the screened capture bar was showing a
-     standing halftone nobody asked for. Every box resets to its own baseline
-     and opts back in explicitly. */
-  --dot-r: 0px;
-  --s: var(--bitmap-step);
-  --bitmap-clip: polygon(
-    calc(var(--s) * 2) 0,
-    calc(100% - var(--s) * 2) 0,
-    calc(100% - var(--s) * 2) var(--s),
-    calc(100% - var(--s)) var(--s),
-    calc(100% - var(--s)) calc(var(--s) * 2),
-    100% calc(var(--s) * 2),
-    100% calc(100% - var(--s) * 2),
-    calc(100% - var(--s)) calc(100% - var(--s) * 2),
-    calc(100% - var(--s)) calc(100% - var(--s)),
-    calc(100% - var(--s) * 2) calc(100% - var(--s)),
-    calc(100% - var(--s) * 2) 100%,
-    calc(var(--s) * 2) 100%,
-    calc(var(--s) * 2) calc(100% - var(--s)),
-    var(--s) calc(100% - var(--s)),
-    var(--s) calc(100% - var(--s) * 2),
-    0 calc(100% - var(--s) * 2),
-    0 calc(var(--s) * 2),
-    var(--s) calc(var(--s) * 2),
-    var(--s) var(--s),
-    calc(var(--s) * 2) var(--s)
-  );
-
+@utility shine {
+  /* A conic-gradient ring, not a box-shadow: a shadow can't be masked down
+     to a hairline that still turns the box's own corners. This pseudo IS a
+     ring — the classic double-background/mask-composite trick punches the
+     middle out of a solid square, leaving only a 1.5px frame for the
+     gradient to show through — so the streak follows the frame exactly,
+     corners included, at any card size. */
   position: relative;
-  /* Creates the stacking context that lets ::before sit above the ink but
-     below the label, without the label needing a z-index of its own. */
   isolation: isolate;
-  background-color: var(--bitmap-ink);
-  clip-path: var(--bitmap-clip);
-  transition:
-    background-color var(--duration-ui) var(--ease-out-soft),
-    --dot-r var(--duration-ui) var(--ease-out-soft),
-    color var(--duration-ui) var(--ease-out-soft);
 
-  &::before {
+  &::after {
     content: "";
     position: absolute;
-    inset: var(--bitmap-ink-w);
-    z-index: -1;
-    clip-path: var(--bitmap-clip);
-    background-color: var(--bitmap-fill);
-    /* The screen itself. The falloff is a MULTIPLE of the radius, not a fixed
-       offset past it. Two reasons: it keeps the dot edge equally hard at every
-       size — a halftone dot has an edge, it does not feather into a blob — and
-       it makes a radius of zero mean genuinely zero. With a fixed "+ 0.35px"
-       the two stops stay apart at r=0, so every 4px cell still painted a
-       sub-pixel speck and controls that should be clean slabs at rest carried
-       a faint standing texture. Here both stops collapse together and nothing
-       is drawn at all. */
-    background-image: radial-gradient(
-      circle at center,
-      var(--bitmap-dot) var(--dot-r),
-      transparent calc(var(--dot-r) * 1.4)
+    inset: 0;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--shine-angle),
+      transparent 0deg,
+      transparent 268deg,
+      rgb(255 255 255 / 0.9) 288deg,
+      rgb(255 255 255 / 0.9) 300deg,
+      transparent 320deg,
+      transparent 360deg
     );
-    background-size: var(--dot-grid) var(--dot-grid);
-    transition:
-      background-color var(--duration-ui) var(--ease-out-soft),
-      inset var(--duration-ui) var(--ease-out-soft);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-ui) var(--ease-out-soft);
   }
 
-  /* Focus has to live inside the clip: thicker ink, lit to violet, and the
-     screen comes up with it so the change is not carried by colour alone. */
-  &:focus-visible {
-    outline: none;
-    --bitmap-ink: var(--color-brand-soft);
-    --bitmap-ink-w: 2px;
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    animation: shine-rotate 1.6s linear infinite;
   }
-}
-
-@utility bitmap-flat {
-  /* Square-cornered member of the same family, for boxes big enough that a
-     6px corner step would read as an accident rather than a decision. */
-  --bitmap-clip: none;
-}
-
-@utility bitmap-clip {
-  /* For an opaque child sitting DIRECTLY inside a `bitmap` box at the same
-     size as its fill (e.g. `bitmap p-px` wrapping a cover image edge to
-     edge) — an <img> is a plain rectangle, so without this its square corners
-     paint straight over the stairstep the ink is cut to, and the frame reads
-     as broken at every corner. --bitmap-clip and --s are ordinary custom
-     properties and inherit from the ancestor .bitmap box; applying the same
-     clip-path here re-resolves that formula against THIS element's own box,
-     which — because the padding matches --bitmap-ink-w — is exactly the
-     fill's box, so the two shapes coincide. */
-  clip-path: var(--bitmap-clip);
-}
-
-@utility bitmap-clip-top {
-  /* Same idea as bitmap-clip, but for a media panel that is only the TOP
-     slice of a bitmap card (ProtocolCard, BlogCard): the cover image sits
-     above a separate text panel, so only the card's own two top corners are
-     real corners. Cutting all four the way bitmap-clip does would carve
-     stairsteps into the bottom of the image where it meets the text below —
-     an internal seam, not a card edge. This cuts the top two only and leaves
-     the bottom edge a plain straight line. */
-  clip-path: polygon(
-    calc(var(--s) * 2) 0,
-    calc(100% - var(--s) * 2) 0,
-    calc(100% - var(--s) * 2) var(--s),
-    calc(100% - var(--s)) var(--s),
-    calc(100% - var(--s)) calc(var(--s) * 2),
-    100% calc(var(--s) * 2),
-    100% 100%,
-    0 100%,
-    0 calc(var(--s) * 2),
-    var(--s) calc(var(--s) * 2),
-    var(--s) var(--s),
-    calc(var(--s) * 2) var(--s)
-  );
 }

@@ -2,11 +2,12 @@
 /**
  * NewsletterForm — the capture bar in the footer band.
  *
- * Cut from the bitmap material rather than the hero pill's glass: the footer
- * is a solid region of the plate, and a frosted capsule there was borrowing a
- * material that only means something where it floats over the 3D pill. The
- * bar screens up as it takes focus, the same halftone move every other
- * control makes.
+ * A plain bordered box, not the hero pill's glass — the footer is a solid
+ * region of the page, and a frosted capsule there was borrowing a material
+ * that only means something where it floats over the 3D pill. On focus the
+ * border lifts to brand-soft and the standard soft violet glow appears
+ * around the bar, the same feedback every field and button on the site now
+ * gives.
  *
  * Posts to /api/newsletter with fetch, falling back to a normal form POST if
  * JS is unavailable. Status is announced via aria-live.
@@ -24,7 +25,7 @@ const { class: className = "" } = Astro.props;
   class:list={["w-full", className]}
 >
   <div
-    class="bitmap flex items-center gap-2 p-1.5 pl-5 [--bitmap-fill:var(--color-void-900)] [--bitmap-dot:rgb(255_255_255/0.16)] [--dot-r:0.5px] focus-within:[--dot-r:1px] focus-within:[--bitmap-ink:var(--color-brand-soft)]"
+    class="flex items-center gap-2 border border-border bg-void-900 p-1.5 pl-5 transition-[border-color,box-shadow] duration-[var(--duration-ui)] ease-[var(--ease-out-soft)] focus-within:border-brand-soft focus-within:shadow-[var(--shadow-glow-sm)]"
   >
     <label for="newsletter-email" class="sr-only">Email address</label>
     <input
@@ -53,7 +54,7 @@ const { class: className = "" } = Astro.props;
         Hover is the original plain opacity fade, not the halftone grow. */}
     <button
       type="submit"
-      class="bitmap grid size-11 shrink-0 place-items-center text-void-950 transition-opacity duration-[var(--duration-ui)] [--bitmap-step:2px] [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] hover:opacity-[0.88] focus-visible:opacity-[0.88]"
+      class="grid size-11 shrink-0 place-items-center border border-transparent bg-chalk text-void-950 transition-opacity duration-[var(--duration-ui)] hover:opacity-[0.88] focus-visible:opacity-[0.88]"
     >
       <span class="sr-only">Subscribe</span>
       <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">

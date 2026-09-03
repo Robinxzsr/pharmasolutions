@@ -17,12 +17,16 @@
  * can click" moments on the site read as one system. See `halftone` in
  * global.css for why that replaces the site's usual `glass` blur here.
  *
+ * The card's OUTER frame hover is `shine` (see global.css): a single white
+ * streak travels once around the border while the card is hovered, rather
+ * than a flat colour change — the site's one deliberately animated hover,
+ * reserved for the one clickable "look at this" object on a page.
+ *
  * The pill's arrow is the same four-rect pixel glyph as the nav's hover
  * arrow (see Header.astro), not the smooth rounded-stroke icon a generic
  * arrow-right would use — same reasoning: hard 90° corners read as one
  * system with the pixel display face, and a round stroke-linecap/linejoin
- * doesn't. No `shape-rendering: crispEdges` here either, for the same
- * measured reason documented on Header.astro's arrow.
+ * doesn't.
  *
  * The text block below the cover is a flex column with the price pushed
  * down by `mt-auto`: summary length varies protocol to protocol, and a grid
@@ -43,12 +47,9 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
 
 <a
   href={`/protocols/${protocol.id}`}
-  class="group/card bitmap flex h-full flex-col p-0.5 [--bitmap-step:4px] [--bitmap-ink-w:2px] [--bitmap-fill:var(--color-surface-raised)] transition-colors duration-300 ease-out hover:[--bitmap-ink:var(--color-violet-500)] focus-visible:[--bitmap-ink:var(--color-brand-soft)]"
+  class="group/card shine flex h-full flex-col border border-border bg-surface-raised"
 >
-  {/* bitmap-clip-top: without it the opaque cover's square corners paint over
-      the stairstep cut into the ink above them — see BlogCard.astro, which
-      carries the fuller explanation, and bitmap-clip-top in global.css. */}
-  <div class="relative shrink-0 overflow-hidden bitmap-clip-top">
+  <div class="relative shrink-0 overflow-hidden">
     {
       cover ? (
         <Image
@@ -78,7 +79,7 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
       class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
       <span
-        class="bitmap inline-flex items-center gap-2 px-5 py-2.5 font-display text-sm font-bold text-chalk [--bitmap-step:2px] [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:rgb(0_0_0/0.86)]"
+        class="inline-flex items-center gap-2 border border-chalk bg-void-950/90 px-5 py-2.5 font-display text-sm font-bold uppercase tracking-[0.04em] text-chalk"
       >
         View protocol
         <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]">

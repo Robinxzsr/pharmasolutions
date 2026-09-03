@@ -16,13 +16,13 @@ const coaches = (await getCollection("coaches")).sort((a, b) => a.data.order - b
       coaches.map((coach) => (
         <li>
           {coach.data.portrait && (
-            <div class="bitmap p-px [--bitmap-step:4px]">
+            <div class="border border-border">
               <Image
                 src={coach.data.portrait}
                 alt={`Portrait of ${coach.data.name}`}
                 width={320}
                 height={320}
-                class="block w-full bitmap-clip"
+                class="block w-full"
               />
             </div>
           )}

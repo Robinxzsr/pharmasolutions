@@ -34,7 +34,7 @@ const { Content } = await render(protocol);
 ---
 
 <BaseLayout title={name} description={summary}>
-  <Section space="md" glow="top" class="masthead-top">
+  <Section space="md" class="masthead-top">
     <Container>
       <a href="/protocols" class="text-sm text-content-muted transition-colors hover:text-chalk">
         &larr; All protocols
@@ -43,18 +43,18 @@ const { Content } = await render(protocol);
       <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,20rem)_1fr]">
         {
           cover ? (
-            <div class="bitmap p-px [--bitmap-step:4px]">
+            <div class="border border-border">
               <Image
                 src={cover}
                 alt={coverAlt ?? ""}
                 widths={[400, 640, 800]}
                 sizes="(min-width: 1024px) 20rem, 90vw"
-                class="aspect-[16/10] w-full object-cover bitmap-clip"
+                class="aspect-[16/10] w-full object-cover"
               />
             </div>
           ) : (
-            <div class="bitmap p-px [--bitmap-step:4px]">
-              <CoverPlaceholder class="aspect-[16/10] w-full bitmap-clip" />
+            <div class="border border-border">
+              <CoverPlaceholder class="aspect-[16/10] w-full" />
             </div>
           )
         }

@@ -12,17 +12,15 @@ interface Props {
 }
 const { class: className = "" } = Astro.props;
 
-/* The bitmap material lives on a WRAPPER, not on the control: <input> is a
-   replaced element and never renders ::before, which is where the fill and
-   the dot screen are painted. Wrapping also means the screen can react to
-   focus-within, so the whole field responds rather than just the text box.
-
-   A field carries a faint screen at rest — it reads as printed onto the plate
-   rather than cut out of it — and the dots grow as it takes focus. Focus is
-   signalled on two channels, ink colour and tone, never colour alone. */
+/* The border/background live on a WRAPPER, not the control itself, so the
+   focus state can react to `focus-within` — the whole field lights up, not
+   just the text caret inside it. Border and shadow are the standard modern
+   input-focus pair: the border steps up to brand-soft and a soft blurred
+   glow (the same `--shadow-glow-sm` every other control uses) appears
+   around the box, both transitioning smoothly rather than snapping. */
 const shell =
-  "bitmap mt-1.5 [--bitmap-fill:var(--color-surface-raised)] [--bitmap-dot:rgb(255_255_255/0.16)] " +
-  "[--dot-r:0.5px] focus-within:[--dot-r:1px] focus-within:[--bitmap-ink:var(--color-brand-soft)]";
+  "mt-1.5 border border-border bg-surface-raised transition-[border-color,box-shadow] duration-[var(--duration-ui)] " +
+  "ease-[var(--ease-out-soft)] focus-within:border-brand-soft focus-within:shadow-[var(--shadow-glow-sm)]";
 const field = "w-full bg-transparent px-4 py-3 text-chalk placeholder:text-content-faint focus:outline-none";
 const label = "block text-sm font-medium";
 ---
@@ -65,14 +63,14 @@ const label = "block text-sm font-medium";
 
   <label class="flex items-start gap-3 text-sm">
     {/* The OS checkbox is the last rounded, antialiased, blue-when-checked
-        object on the page. Drawn here instead: same pixel corner as every
-        other control, and the tick is a staircase of 2x2 blocks on the same
-        16-unit grid the arrow glyphs use. The real input stays inside the
-        box, transparent and full-size, so it keeps its own semantics, hit
-        target and keyboard behaviour. Focus is lifted via has-[:focus-visible]
-        on the wrapper because clip-path would clip a real outline away. */}
+        object on the page. Drawn here instead: a plain square box matching
+        every other control, with a tick built from the same pixel-glyph hand
+        as the site's arrows. The real input stays inside the box, transparent
+        and full-size, so it keeps its own semantics, hit target and keyboard
+        behaviour — `has-[:focus-visible]` lifts a glow onto the wrapper since
+        the real outline draws around the invisible input, not the visible box. */}
     <span
-      class="bitmap relative mt-0.5 grid size-[18px] shrink-0 place-items-center [--bitmap-step:1px] [--bitmap-fill:var(--color-surface-raised)] has-[:checked]:[--bitmap-fill:var(--color-violet-500)] has-[:checked]:[--bitmap-ink:var(--color-violet-500)] has-[:focus-visible]:[--bitmap-ink:var(--color-brand-soft)] has-[:focus-visible]:[--bitmap-ink-w:2px]"
+      class="relative mt-0.5 grid size-[18px] shrink-0 place-items-center border border-border bg-surface-raised transition-[background-color,border-color,box-shadow] duration-[var(--duration-ui)] has-[:checked]:border-violet-500 has-[:checked]:bg-violet-500 has-[:focus-visible]:border-brand-soft has-[:focus-visible]:shadow-[var(--shadow-glow-sm)]"
     >
       <input type="checkbox" name="consent" required class="peer absolute inset-0 cursor-pointer appearance-none" />
       <svg

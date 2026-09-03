@@ -23,7 +23,7 @@ const modules = (await getCollection("curriculum")).sort(
           {module.data.topics.length > 0 && (
             <ul class="mt-3 flex flex-wrap gap-2">
               {module.data.topics.map((topic) => (
-                <li class="bitmap px-3 py-1 text-sm [--bitmap-step:2px] [--bitmap-fill:var(--color-surface-raised)]">{topic}</li>
+                <li class="border border-border bg-surface-raised px-3 py-1 text-sm">{topic}</li>
               ))}
             </ul>
           )}

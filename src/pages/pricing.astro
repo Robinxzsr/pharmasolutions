@@ -8,13 +8,14 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/ui/Section.astro";
 import Container from "../components/ui/Container.astro";
+import Button from "../components/ui/Button.astro";
 import { getCollection } from "astro:content";
 
 const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="Pricing" description="Coaching plans and protocol access.">
-  <Section space="md" glow="top" class="masthead-top">
+  <Section space="md" class="masthead-top">
     <Container>
       <h1 class="text-[length:var(--text-display-lg)]">Pricing</h1>
     </Container>
@@ -27,15 +28,16 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
           plans.map((plan) => (
             <article
               class:list={[
-                "bitmap flex flex-col p-8 [--bitmap-step:4px] [--bitmap-ink-w:2px] [--bitmap-fill:var(--color-surface-raised)]",
-                /* The recommended plan was marked by a border colour AND a
-                   glow — two elevation systems stacked on one card. It is
-                   marked here the way the plate marks anything: violet ink,
-                   and a standing halftone screen the other cards do not
-                   carry. Tone, not a halo. */
+                "flex flex-col border p-8",
+                /* The recommended plan used to carry a border colour AND a
+                   glow at once — two elevation systems stacked on one card.
+                   It's marked with just the one now: the site's own violet
+                   bloom, permanently on rather than only on hover, which is
+                   exactly how Button's `glow` variant marks the primary
+                   action on a page. Border and glow, not border and dots. */
                 plan.data.highlighted
-                  ? "[--bitmap-ink:var(--color-violet-500)] [--bitmap-dot:var(--color-violet-500)] [--dot-r:0.6px]"
-                  : "",
+                  ? "border-violet-500/50 shadow-[var(--shadow-glow-sm)]"
+                  : "border-border",
               ]}
             >
               <h2 class="text-[length:var(--text-display-sm)]">{plan.data.name}</h2>
@@ -50,22 +52,15 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
                 ))}
               </ul>
 
-              {/* Hover reverted to the original per-plan treatment: the
-                  highlighted plan lightens a shade (violet-500 -> violet-400,
-                  same step Button.astro's `glow` variant uses), the plain
-                  plan just fades — no dot growth on either. */}
-              <button
+              <Button
                 type="button"
+                variant={plan.data.highlighted ? "glow" : "primary"}
+                size="md"
                 data-checkout={plan.data.stripePriceId}
-                class:list={[
-                  "bitmap mt-8 px-6 py-3 font-display font-bold transition-opacity duration-[var(--duration-ui)] disabled:opacity-50",
-                  plan.data.highlighted
-                    ? "text-chalk [--bitmap-ink:var(--color-violet-500)] [--bitmap-fill:var(--color-violet-500)] hover:[--bitmap-ink:var(--color-violet-400)] focus-visible:[--bitmap-ink:var(--color-violet-400)]"
-                    : "text-void-950 [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] hover:opacity-[0.88] focus-visible:opacity-[0.88]",
-                ]}
+                class="mt-8"
               >
                 Choose {plan.data.name}
-              </button>
+              </Button>
             </article>
           ))
         }
