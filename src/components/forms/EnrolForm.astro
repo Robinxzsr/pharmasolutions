@@ -4,6 +4,12 @@
  *
  * Posts to /api/enrol. Works without JS (standard form POST); with JS it
  * submits in place and swaps in a confirmation.
+ *
+ * The form declares `font-body` on its root rather than inheriting. It is
+ * rendered inside PageLayout's `prose-body` container, which sets the
+ * long-form serif — correct for the article pages that container exists for,
+ * wrong for controls. A field label is UI, not reading matter, and it should
+ * speak in the interface's voice no matter what it is nested inside.
  */
 import Button from "../ui/Button.astro";
 
@@ -16,16 +22,19 @@ const { class: className = "" } = Astro.props;
    focus state can react to `focus-within` — the whole field lights up, not
    just the text caret inside it. Border and shadow are the standard modern
    input-focus pair: the border steps up to brand-soft and a soft blurred
-   glow (the same `--shadow-glow-sm` every other control uses) appears
+   bloom (the same `--shadow-glow-sm` every other control uses) appears
    around the box, both transitioning smoothly rather than snapping. */
 const shell =
   "mt-1.5 border border-border bg-surface-raised transition-[border-color,box-shadow] duration-[var(--duration-ui)] " +
-  "ease-[var(--ease-out-soft)] focus-within:border-brand-soft focus-within:shadow-[var(--shadow-glow-sm)]";
-const field = "w-full bg-transparent px-4 py-3 text-chalk placeholder:text-content-faint focus:outline-none";
-const label = "block text-sm font-medium";
+  "ease-[var(--ease-out-soft)] focus-within:border-border-lit focus-within:shadow-[var(--shadow-glow-sm)]";
+const field =
+  "w-full bg-transparent px-4 py-3 text-[15px] text-chalk placeholder:text-content-faint focus:outline-none";
+/* font-bold is a REAL cut now that Mondwest ships a 700 — this used to be
+   font-medium precisely because bolding Mondwest synthesised and smeared. */
+const label = "block text-sm font-bold";
 ---
 
-<form method="POST" action="/api/enrol" data-enrol-form class:list={["flex flex-col gap-5", className]}>
+<form method="POST" action="/api/enrol" data-enrol-form class:list={["flex flex-col gap-5 font-body", className]}>
   <div>
     <label for="enrol-name" class={label}>Your name</label>
     <div class={shell}>
@@ -70,7 +79,7 @@ const label = "block text-sm font-medium";
         behaviour — `has-[:focus-visible]` lifts a glow onto the wrapper since
         the real outline draws around the invisible input, not the visible box. */}
     <span
-      class="relative mt-0.5 grid size-[18px] shrink-0 place-items-center border border-border bg-surface-raised transition-[background-color,border-color,box-shadow] duration-[var(--duration-ui)] has-[:checked]:border-violet-500 has-[:checked]:bg-violet-500 has-[:focus-visible]:border-brand-soft has-[:focus-visible]:shadow-[var(--shadow-glow-sm)]"
+      class="relative mt-0.5 grid size-[18px] shrink-0 place-items-center border border-border bg-surface-raised transition-[background-color,border-color,box-shadow] duration-[var(--duration-ui)] has-[:checked]:border-blue-500 has-[:checked]:bg-blue-500 has-[:focus-visible]:border-border-lit has-[:focus-visible]:shadow-[var(--shadow-glow-sm)]"
     >
       <input type="checkbox" name="consent" required class="peer absolute inset-0 cursor-pointer appearance-none" />
       <svg

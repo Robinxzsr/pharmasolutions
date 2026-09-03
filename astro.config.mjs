@@ -71,6 +71,12 @@ export default defineConfig({
       fallbacks: ["ui-monospace", "monospace"],
     },
     {
+      /**
+       * Mondwest now ships a REAL bold cut, so `font-weight: 700` on body
+       * copy is finally a genuine weight rather than a synthesised smear.
+       * That lifts the long-standing "anything bold must use font-display"
+       * constraint — see CLAUDE.md.
+       */
       provider: fontProviders.local(),
       name: "PP Mondwest",
       cssVariable: "--font-mondwest",
@@ -81,22 +87,51 @@ export default defineConfig({
             style: "normal",
             src: ["./src/assets/fonts/ppmondwest-regular.woff2"],
           },
+          {
+            weight: 700,
+            style: "normal",
+            src: ["./src/assets/fonts/ppmondwest-bold.woff2"],
+          },
         ],
       },
       fallbacks: ["ui-monospace", "monospace"],
     },
     {
       /**
-       * Long-form reading face. The pixel faces are display types — they are
-       * punishing at paragraph length, so articles get a real text face.
+       * Long-form reading face, replacing Inter. The pixel faces are display
+       * types — punishing at paragraph length — and Inter, while readable,
+       * belonged to no one: a neutral system sans under two Pangram Pangram
+       * display cuts read as a fallback that never got replaced. Editorial
+       * New is a text face with an actual point of view, and it is quiet
+       * enough to carry a page of prose.
+       *
+       * Three cuts, because prose genuinely uses three: roman, italic for
+       * emphasis, and a real bold for `<strong>` so MDX articles never
+       * synthesise one. Only fetched on pages that render prose.
        */
-      provider: fontProviders.google(),
-      name: "Inter",
-      cssVariable: "--font-inter",
-      weights: ["400", "500"],
-      styles: ["normal"],
-      subsets: ["latin"],
-      fallbacks: ["system-ui", "sans-serif"],
+      provider: fontProviders.local(),
+      name: "PP Editorial New",
+      cssVariable: "--font-editorial",
+      options: {
+        variants: [
+          {
+            weight: 400,
+            style: "normal",
+            src: ["./src/assets/fonts/ppeditorialnew-regular.woff2"],
+          },
+          {
+            weight: 400,
+            style: "italic",
+            src: ["./src/assets/fonts/ppeditorialnew-italic.woff2"],
+          },
+          {
+            weight: 700,
+            style: "normal",
+            src: ["./src/assets/fonts/ppeditorialnew-ultrabold.woff2"],
+          },
+        ],
+      },
+      fallbacks: ["Georgia", "serif"],
     },
   ],
 

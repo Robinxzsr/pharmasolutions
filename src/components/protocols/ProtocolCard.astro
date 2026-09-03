@@ -79,7 +79,7 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
       class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
       <span
-        class="inline-flex items-center gap-2 border border-chalk bg-void-950/90 px-5 py-2.5 font-display text-sm font-bold uppercase tracking-[0.04em] text-chalk"
+        class="inline-flex items-center gap-2 border border-chalk bg-chalk px-5 py-2.5 font-display text-sm font-bold uppercase tracking-[0.1em] text-void-950"
       >
         View protocol
         <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]">
@@ -94,7 +94,7 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
 
   <div class="flex flex-1 flex-col p-5">
     <h2 class="line-clamp-2 text-[length:var(--text-display-card)] text-chalk">{name}</h2>
-    <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-content-muted">{summary}</p>
+    <p class="mt-2 line-clamp-3 font-prose text-[13.5px] leading-relaxed text-content-muted">{summary}</p>
     {/* mt-auto: pinned to the bottom of the flex column regardless of how
         much room the name and summary above took up. */}
     <p class="mt-auto pt-3 font-display text-lg font-bold text-brand-soft">{priceDisplay}</p>

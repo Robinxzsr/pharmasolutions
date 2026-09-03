@@ -86,11 +86,11 @@ const GLOW = {
   /** Intensity of the white rim light — the main source of the white-hot core. */
   rimLight: 0.6,
   /**
-   * The pill's own surface colour. Kept lavender rather than near-white so it
-   * still reads as violet under direct light, instead of blowing out white.
+   * The pill's own surface colour. Kept a pale tint rather than near-white so
+   * it still reads as blue under direct light, instead of blowing out white.
    */
-  surfaceColor: 0xd9c4ff,
-  /** Violet key light. */
+  surfaceColor: 0xc9d2ff,
+  /** Blue key light. */
   keyLight: 3.2,
   /**
    * Bloom. A low threshold pulls the pill's mid-tones into the halo (rather
@@ -208,15 +208,20 @@ export function initPillScene({
     }
   }
 
-  // -- Lighting: violet key, ember fill, white rim, violet back --
+  /* Lighting: blue key, pale-blue fill, white rim, deep-blue back.
+     The fill used to be a warm ember (0xff8c42) acting as a colour
+     counterweight to the violet. The palette is black/white/blue only now,
+     so the counterweight is temperature rather than hue: a much paler,
+     cooler blue than the key, which still separates the two lit sides
+     without introducing a second colour into a three-colour scheme. */
   const ambient = new THREE.AmbientLight(0xffffff, 0.2);
-  const keyLight = new THREE.DirectionalLight(0x9d4edd, GLOW.keyLight);
+  const keyLight = new THREE.DirectionalLight(0x4457ff, GLOW.keyLight);
   keyLight.position.set(-3, 2, 3);
-  const fillLight = new THREE.DirectionalLight(0xff8c42, 1.1);
+  const fillLight = new THREE.DirectionalLight(0xa9c4ff, 1.1);
   fillLight.position.set(3, -1, 3);
   const rimLight = new THREE.DirectionalLight(0xffffff, GLOW.rimLight);
   rimLight.position.set(0, 3, -4);
-  const backLight = new THREE.DirectionalLight(0x6a0dad, 2.5);
+  const backLight = new THREE.DirectionalLight(0x141c96, 2.5);
   backLight.position.set(0, -2, -3);
 
   scene.add(ambient, keyLight, fillLight, rimLight, backLight);
@@ -227,12 +232,17 @@ export function initPillScene({
     metalness: 0.0,
     roughness: GLOW.roughness,
     ior: 1.45,
-    emissive: 0x7c4dff,
+    /* The emissive is blue-400, not the brand blue-500: emission drives the
+       bloom, and #202CDE sits well below the bloom threshold — swapping the
+       hue at equal-ish luminance to the old violet (0.158 vs 0.167 relative)
+       keeps the pass tuned exactly where it was. See the bloom notes in
+       CLAUDE.md before moving it. */
+    emissive: 0x4457ff,
     emissiveIntensity: GLOW.emissive,
     clearcoat: GLOW.clearcoat,
     clearcoatRoughness: GLOW.clearcoatRoughness,
     sheen: GLOW.sheen,
-    sheenColor: new THREE.Color(0xffa060),
+    sheenColor: new THREE.Color(0xa0b4ff),
   });
 
   /**

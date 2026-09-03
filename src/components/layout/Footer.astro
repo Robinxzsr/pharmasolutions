@@ -1,7 +1,7 @@
 ---
 /**
  * Footer — four nav columns over the void, with the newsletter capture
- * sitting in a violet wash that echoes the hero's bloom.
+ * sitting on the flat page ground.
  */
 import Section from "../ui/Section.astro";
 import Container from "../ui/Container.astro";
@@ -36,10 +36,10 @@ const year = new Date().getFullYear();
                   <a
                     href={s.href}
                     rel="me noopener"
-                    class="glow-hover grid size-10 place-items-center border border-border bg-void-900 text-content-muted hover:border-brand-soft hover:text-chalk focus-visible:border-brand-soft focus-visible:text-chalk"
+                    class="lift grid size-10 place-items-center border border-border bg-void-900 text-content-muted hover:border-border-lit hover:bg-blue-500 hover:text-chalk focus-visible:border-border-lit focus-visible:bg-blue-500 focus-visible:text-chalk"
                   >
                     <span class="sr-only">{s.label}</span>
-                    <span aria-hidden="true" class="text-xs">
+                    <span aria-hidden="true" class="label">
                       {s.label.slice(0, 2)}
                     </span>
                   </a>

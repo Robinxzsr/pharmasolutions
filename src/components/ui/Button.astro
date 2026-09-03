@@ -2,17 +2,26 @@
 /**
  * Button — renders as <a> when given an href, otherwise <button>.
  *
- * A plain rectangle: flat fill, 1.5px border, square corners — no radius, no
- * clip-path. Hover is `glow-hover` (see global.css): the border lifts a
- * shade and the site's own violet bloom (`--shadow-glow-sm`) appears behind
- * the box, the same accent language the hero pill already uses, so every
- * "press this" on the site sits in one light instead of each control
- * inventing its own.
+ * A plain rectangle: flat fill, 1px border, square corners.
  *
- * Labels are set uppercase with a touch of tracking — the small-caps-style
- * treatment most CTA buttons use, distinct from the display type's own
- * tracking (which stays tight; this is a different axis, applied to a
- * short, all-caps label rather than a sentence).
+ * Every variant INVERTS on hover rather than merely tinting. That is the
+ * move the reference sites use, and it is the reason their buttons feel
+ * decisive: the control doesn't warm up by 8%, it commits to a different
+ * state. Each variant inverts toward a different member of the three-colour
+ * palette, so the three of them stay distinguishable while hovered:
+ *
+ *   primary  white slab      ->  blue fill, white label
+ *   glow     blue slab       ->  white fill, blue label
+ *   ghost    outline only    ->  white fill, black label
+ *
+ * All three also take the bloom (`--shadow-glow-sm`), so the light behind a
+ * pressed-looking control is the same light the hero pill throws. Timing is
+ * --duration-ui, fast enough to read as a response rather than an animation;
+ * sustained motion on this site belongs to cards (`shine`) alone.
+ *
+ * Labels are uppercase and widely tracked — the CTA treatment from the
+ * reference material, and the same voice as the `label` utility so a button
+ * and a card tag read as the same system.
  */
 interface Props {
   href?: string;
@@ -37,25 +46,26 @@ const {
 const Tag = href ? "a" : "button";
 
 const base =
-  "inline-flex items-center justify-center gap-[11px] leading-none transition-[background-color,border-color,opacity,box-shadow] " +
-  "duration-[var(--duration-ui)] ease-[var(--ease-out-soft)] font-display font-bold uppercase tracking-[0.04em] border " +
-  "disabled:pointer-events-none disabled:opacity-50";
+  "lift inline-flex items-center justify-center gap-[11px] leading-none border " +
+  "font-display font-bold uppercase tracking-[0.1em] disabled:pointer-events-none disabled:opacity-50";
 
-/* NeueBit is the only true bold face available — Mondwest would be
-   synthesised (faux) bold, which smears a pixel typeface.
-
-   `glow` is the one variant that glows at rest, not just on hover — the
-   permanent bloom is what marks it as the primary action on a page (enrol,
-   checkout), and hover just steps the whole thing up a shade brighter and
-   the blur wider (`--shadow-glow-lg` in place of `-sm`), rather than using
-   the shared `glow-hover` utility, which would fight this variant's own
-   always-on shadow for which one wins on hover. */
+/* `glow` is the one variant lit at rest as well as on hover — the standing
+   bloom is what marks it as the single primary action on a page (enrol,
+   checkout). Its hover therefore has to be a genuine inversion rather than
+   "more glow", or there'd be nowhere left for it to go. */
 const variantClass = {
-  primary: "glow-hover border-transparent bg-chalk text-void-950 hover:opacity-[0.88]",
+  primary:
+    "border-chalk bg-chalk text-void-950 " +
+    "hover:border-blue-500 hover:bg-blue-500 hover:text-chalk " +
+    "focus-visible:border-blue-500 focus-visible:bg-blue-500 focus-visible:text-chalk",
   glow:
-    "border-transparent bg-violet-500 text-chalk shadow-[var(--shadow-glow-sm)] " +
-    "hover:bg-violet-400 hover:shadow-[var(--shadow-glow-lg)] focus-visible:bg-violet-400 focus-visible:shadow-[var(--shadow-glow-lg)]",
-  ghost: "glow-hover border-chalk/30 bg-transparent text-chalk hover:border-chalk/55 hover:bg-white/[0.08]",
+    "border-blue-500 bg-blue-500 text-chalk shadow-[var(--shadow-glow-sm)] " +
+    "hover:border-chalk hover:bg-chalk hover:text-blue-600 hover:shadow-[var(--shadow-glow-lg)] " +
+    "focus-visible:border-chalk focus-visible:bg-chalk focus-visible:text-blue-600 focus-visible:shadow-[var(--shadow-glow-lg)]",
+  ghost:
+    "border-chalk/35 bg-transparent text-chalk " +
+    "hover:border-chalk hover:bg-chalk hover:text-void-950 " +
+    "focus-visible:border-chalk focus-visible:bg-chalk focus-visible:text-void-950",
 }[variant];
 
 const sizeClass = {

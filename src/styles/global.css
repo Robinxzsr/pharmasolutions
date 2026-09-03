@@ -9,30 +9,40 @@
 
 @theme {
   /* --- Palette -------------------------------------------------------------
-     Near-black ground, violet as the active/emissive hue, ember as the warm
-     counter-light. Sampled from the hero's three-point lighting rig so the
-     2D UI and the 3D scene agree on the same colours.
+     THREE colours: black, white, and one blue. Nothing else.
+
+     The palette used to run violet AND a warm ember counter-light, which is
+     what made the site read as assembled rather than designed — two accents
+     competing, neither owning anything. Ember is retired and violet is
+     replaced by a single electric blue that every accent on the site now
+     resolves to.
   */
 
-  /* Ground — the black the whole site sits on */
+  /* Ground — the black the whole site sits on. Not neutral: the darks carry
+     a faint blue cast so the ground reads as the same family as the accent
+     rather than as "black, plus a colour that happens to sit on it". */
   --color-void-950: #000000;
-  --color-void-900: #060608;
-  --color-void-800: #0d0d12;
-  --color-void-700: #16161d;
-  --color-void-600: #22222c;
-  --color-void-500: #32323f;
+  --color-void-900: #05060d;
+  --color-void-800: #0b0d18;
+  --color-void-700: #131629;
+  --color-void-600: #1e2238;
+  --color-void-500: #2e3350;
 
-  /* Violet — the pill's emissive, the primary accent */
-  --color-violet-200: #e8dcff;
-  --color-violet-300: #c4a8ff;
-  --color-violet-400: #9d4edd;
-  --color-violet-500: #7c4dff;
-  --color-violet-600: #6a0dad;
-
-  /* Ember — the warm rim light; used sparingly as a counterweight */
-  --color-ember-300: #ffb37a;
-  --color-ember-400: #ff8c42;
-  --color-ember-500: #e0662a;
+  /* Blue — the one accent. 500 is the brand hex; the ramp exists because a
+     single value cannot do every job:
+       300  the only step that clears 4.5:1 on black, so all accent TEXT.
+            Pulled toward cyan rather than straight up the brand hue: a
+            naive tint of #202CDE reads lavender, which is the exact colour
+            this palette was moved off.
+       400  the lifted/hover step, and the hero pill's emissive sibling —
+            an emitting surface reads brighter than the flat swatch
+       500  #202CDE, the brand colour, for fills and borders
+       600  pressed/deep fills */
+  --color-blue-200: #dbe1ff;
+  --color-blue-300: #8fa3ff;
+  --color-blue-400: #4457ff;
+  --color-blue-500: #202cde;
+  --color-blue-600: #141c96;
 
   /* Text — pure white down through the alpha steps the hero uses */
   --color-chalk: #ffffff;
@@ -53,22 +63,32 @@
   --color-content: var(--color-chalk);
   --color-content-muted: var(--color-chalk-muted);
   --color-content-faint: var(--color-chalk-faint);
-  --color-brand: var(--color-violet-500);
-  --color-brand-soft: var(--color-violet-300);
-  --color-accent: var(--color-ember-400);
+  --color-brand: var(--color-blue-500);
+  --color-brand-soft: var(--color-blue-300);
   --color-border: var(--color-edge);
+  /* The border a surface gets when it is active, focused, or hovered. Named
+     rather than reached for ad hoc, because "which blue does a lit border
+     use" was being answered differently in five components. */
+  --color-border-lit: var(--color-blue-400);
 
   /* --- Typography ----------------------------------------------------------
-     Two pixel display faces carry the brand; a real text face carries the
-     paragraphs. NeueBit is the only true bold available — Mondwest would be
-     synthesised bold, which smears a pixel typeface.
+     Three faces, three jobs, no overlap:
 
-     `--font-neuebit` / `--font-mondwest` / `--font-inter` are emitted by the
-     Astro Fonts API (see `fonts` in astro.config.mjs).
+       display  NeueBit, bold pixel — headlines and control labels. Loud.
+       body     Mondwest, pixel — UI copy, meta, labels. Now has a REAL bold
+                cut (700), so the old "never bold Mondwest, it synthesises
+                and smears" rule is retired: `font-bold` on body copy is a
+                genuine weight again.
+       prose    Editorial New — anything you actually sit and READ. The pixel
+                faces are display types and punish at paragraph length; this
+                is the serious voice, and it is the one place on the site
+                that is not trying to be a poster.
+
+     Emitted by the Astro Fonts API (see `fonts` in astro.config.mjs).
   */
   --font-display: var(--font-neuebit);
   --font-body: var(--font-mondwest);
-  --font-prose: var(--font-inter);
+  --font-prose: var(--font-editorial);
 
   /* Fluid display scale — clamp() so oversized headings survive mobile.
      Values carried over from the hero prototype. */
@@ -84,11 +104,9 @@
   --text-ui: clamp(11px, 0.88vw, 14px);
 
   /* --- Shape ---------------------------------------------------------------
-     Fully-rounded pills for every interactive control, soft rounding for
-     panels. Nothing is sharp.
+     Everything is a square-cornered box. `--radius-pill` survives only for
+     the nav capsule that floats over the hero; nothing else may use it.
   */
-  --radius-soft: 0.75rem;
-  --radius-card: 1.25rem;
   --radius-pill: 999px;
 
   /* --- Motion --------------------------------------------------------------
@@ -100,10 +118,12 @@
 
   /* --- Glow ----------------------------------------------------------------
      The 2D echo of the hero's bloom pass, so buttons and panels sit in the
-     same light as the 3D scene.
+     same light as the 3D scene. Keyed to blue-400, not the brand 500: a
+     bloom is light leaving a surface, and #202CDE is too dark to read as
+     light once it is blurred out over black.
   */
-  --shadow-glow-sm: 0 0 24px -6px rgb(124 77 255 / 0.45);
-  --shadow-glow-lg: 0 0 80px -12px rgb(124 77 255 / 0.55);
+  --shadow-glow-sm: 0 0 24px -6px rgb(68 87 255 / 0.55);
+  --shadow-glow-lg: 0 0 80px -12px rgb(68 87 255 / 0.6);
 }
 
 /* ==========================================================================
@@ -162,10 +182,10 @@
 
   /* Browser surfaces the design still owns. A blinking 1px system caret in a
      field set in a pixel face is where the illusion breaks first; the wide
-     violet caret is what a bitmap terminal actually had. */
+     blue caret is what a bitmap terminal actually had. */
   input,
   textarea {
-    caret-color: var(--color-violet-300);
+    caret-color: var(--color-blue-300);
   }
 
   * {
@@ -174,7 +194,7 @@
   }
 
   ::selection {
-    background: var(--color-violet-500);
+    background: var(--color-blue-500);
     color: var(--color-chalk);
   }
 }
@@ -246,11 +266,22 @@
 }
 
 @utility prose-body {
-  /* Long-form article copy: real text face, comfortable measure. */
+  /* Long-form article copy: the one place on the site set in a real text
+     face. Editorial New runs optically smaller than the Inter it replaced at
+     an identical px value, and it is a higher-contrast serif, so it needs
+     both a size bump and slightly tighter leading than the old 1rem/1.7 to
+     hold a paragraph together rather than letting the lines drift apart. */
   font-family: var(--font-prose);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 1.0625rem;
+  line-height: 1.65;
   color: var(--color-content-muted);
+
+  /* A serif earns real italics and a real bold — both are shipped cuts now,
+     so nothing here is synthesised. */
+  & strong {
+    font-weight: 700;
+    color: var(--color-content);
+  }
 }
 
 @utility reveal-hidden {
@@ -278,23 +309,22 @@
    radius, no clip-path, so a real browser focus outline works everywhere
    again instead of needing a drawn-in-place substitute.
 
-   Two hover languages, chosen by what's being hovered, not stacked onto
-   everything:
+   ONE interaction grammar, three tiers, so a hover means the same kind of
+   thing everywhere on the site:
 
-   - `glow-hover`: buttons, fields, chips, tiles — anything you operate. The
-     border lifts a shade and the site's own violet bloom (`--shadow-glow-sm`,
-     defined above — the same one the hero pill and glow buttons already use)
-     appears behind the box. One accent language for every "press this",
-     reused rather than invented per control.
+   - `shine`  — cards. A bright streak travels the border while hovered.
+   - `lift`   — buttons, fields, tiles. The frame lights and a bloom rises
+                behind it; the fill flip lives on the component.
+   - links    — colour steps to brand-soft. Handled per component.
 
-   - `shine`: cards only. A single bright streak travels once around the
-     frame's perimeter for as long as the card is hovered, the way the
-     reference brief's example site treats its own cards. Cards are the one
-     "look at this" object on the site, so they're the one place that earns
-     motion the buttons don't get.
+   The rule is: motion belongs to the thing you're being invited to open;
+   everything else changes state without moving.
    ========================================================================== */
 
-@utility glow-hover {
+@utility lift {
+  /* The shared "this is live" response for anything operable. Deliberately
+     fast (--duration-ui) so a control feels answered rather than animated;
+     `shine` is the only place on the site that gets sustained motion. */
   transition:
     border-color var(--duration-ui) var(--ease-out-soft),
     background-color var(--duration-ui) var(--ease-out-soft),
@@ -308,28 +338,38 @@
   }
 }
 
-/* Registering the angle as a real <angle> is what lets it animate on its
-   own timeline (the @keyframes below) rather than needing JS to drive a
-   requestAnimationFrame loop. */
-@property --shine-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes shine-rotate {
-  to {
-    --shine-angle: 360deg;
+@keyframes shine-pan {
+  0% {
+    background-position: 12% 12%;
+  }
+  100% {
+    background-position: 78% 78%;
   }
 }
 
 @utility shine {
-  /* A conic-gradient ring, not a box-shadow: a shadow can't be masked down
-     to a hairline that still turns the box's own corners. This pseudo IS a
-     ring — the classic double-background/mask-composite trick punches the
-     middle out of a solid square, leaving only a 1.5px frame for the
-     gradient to show through — so the streak follows the frame exactly,
-     corners included, at any card size. */
+  /* A gradient RING that pans, not a rotating arc.
+     ---------------------------------------------------------------------
+     The ring itself is the standard double-background/mask-composite trick:
+     paint a gradient over the whole box, then punch the content-box out of
+     it with `mask-composite: exclude`, leaving only the 1.5px padding as a
+     frame for the gradient to show through. A box-shadow cannot do this —
+     it can't be masked down to a hairline that still turns the corners.
+
+     What travels is `background-position` across a 300%-sized gradient,
+     which buys two things a rotating conic can't:
+
+       1. THREE bands, not one. The gradient carries three bright stops with
+          transparent gaps between them, so several highlights chase each
+          other round the frame instead of one lonely dot orbiting it.
+       2. The animation runs ALWAYS and is `paused` at rest, resuming on
+          hover. A rotation that starts from 0deg on every hover always
+          enters from the same corner, which is what makes that kind of
+          effect read as canned; resuming mid-cycle means the streak picks
+          up wherever it left off and no two hovers look alike.
+
+     Each band runs white → blue → deep-blue so the highlight has an actual
+     edge to it rather than being a soft white smear. */
   position: relative;
   isolation: isolate;
 
@@ -338,15 +378,21 @@
     position: absolute;
     inset: 0;
     padding: 1.5px;
-    background: conic-gradient(
-      from var(--shine-angle),
-      transparent 0deg,
-      transparent 268deg,
-      rgb(255 255 255 / 0.9) 288deg,
-      rgb(255 255 255 / 0.9) 300deg,
-      transparent 320deg,
-      transparent 360deg
+    background: linear-gradient(
+      145deg,
+      transparent 0%,
+      var(--color-chalk) 14%,
+      var(--color-blue-400) 19%,
+      var(--color-blue-600) 24%,
+      transparent 33% 42%,
+      var(--color-chalk) 54%,
+      var(--color-blue-400) 59%,
+      var(--color-blue-600) 64%,
+      transparent 73% 82%,
+      var(--color-chalk) 94%,
+      var(--color-blue-400) 100%
     );
+    background-size: 300% 300%;
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
       linear-gradient(#000 0 0);
@@ -354,12 +400,38 @@
     mask-composite: exclude;
     opacity: 0;
     pointer-events: none;
+    animation: shine-pan 2.4s linear infinite paused;
     transition: opacity var(--duration-ui) var(--ease-out-soft);
   }
 
   &:hover::after,
   &:focus-visible::after {
     opacity: 1;
-    animation: shine-rotate 1.6s linear infinite;
+    animation-play-state: running;
   }
+}
+
+/* ==========================================================================
+   THE MICRO-LABEL
+   ==========================================================================
+
+   The single most repeated element in the reference material: a very small,
+   uppercase, widely-letterspaced tag — section markers, card categories,
+   metadata, statuses. It is what ties a page of otherwise unrelated blocks
+   together, because the same voice keeps reappearing at the same size in
+   the same weight no matter what it is labelling.
+
+   The site had four different treatments for this (11px muted, 12px chalk,
+   uppercase-without-tracking, tracked-without-uppercase). This is now the
+   only one. Tracking is positive and generous — at 11px, uppercase pixel
+   letterforms set solid are a smear.
+   ========================================================================== */
+
+@utility label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }

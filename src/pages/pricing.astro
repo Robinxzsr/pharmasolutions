@@ -31,12 +31,12 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
                 "flex flex-col border p-8",
                 /* The recommended plan used to carry a border colour AND a
                    glow at once — two elevation systems stacked on one card.
-                   It's marked with just the one now: the site's own violet
+                   It's marked with just the one now: the site's own blue
                    bloom, permanently on rather than only on hover, which is
                    exactly how Button's `glow` variant marks the primary
                    action on a page. Border and glow, not border and dots. */
                 plan.data.highlighted
-                  ? "border-violet-500/50 shadow-[var(--shadow-glow-sm)]"
+                  ? "border-blue-500/50 shadow-[var(--shadow-glow-sm)]"
                   : "border-border",
               ]}
             >
