@@ -3,10 +3,15 @@
  * PageLayout — standard content page.
  *
  * Wraps BaseLayout with a titled masthead, for pages that are mostly prose
- * (About, FAQ, Legal). The home page composes Hero + Sections directly on
- * BaseLayout instead.
+ * (About, FAQ, Legal, Coaching, Blog). The home page composes Hero + Sections
+ * directly on BaseLayout instead, and /protocols composes PageHeader directly
+ * so its card grid can share the masthead's band.
+ *
+ * The masthead itself is PageHeader — this layout deliberately owns no
+ * position of its own, so these pages and /protocols can't drift apart.
  */
 import BaseLayout from "./BaseLayout.astro";
+import PageHeader from "../components/ui/PageHeader.astro";
 import Section from "../components/ui/Section.astro";
 import Container from "../components/ui/Container.astro";
 
@@ -22,12 +27,7 @@ const { title, description, lede, noindex } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
-  <Section space="md" glow="top" class="pt-40">
-    <Container>
-      <h1 class="text-[length:var(--text-display-lg)]">{title}</h1>
-      {lede && <p class="mt-5 max-w-xl text-lg text-content-muted">{lede}</p>}
-    </Container>
-  </Section>
+  <PageHeader title={title} lede={lede} />
 
   <Section space="md">
     <Container width="prose" class="prose-body">

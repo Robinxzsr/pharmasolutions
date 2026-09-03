@@ -164,6 +164,41 @@
    Style-specific primitives Tailwind has no equivalent for.
    ========================================================================== */
 
+/* --- Masthead position -----------------------------------------------------
+   Where a page's title starts, defined once. Every page's masthead uses this,
+   via PageHeader.astro for the standard title+lede case or the `masthead-top`
+   utility directly for a bespoke one (see protocols/[...slug]).
+
+   It is two values because of a measured constraint, not taste. The nav rail's
+   links run down to y≈203 and out to x≈167, and the centred content column
+   only clears that horizontally at roughly 1400px and up:
+
+     vw 1280 -> -63px    vw 1366 -> -20px
+     vw 1440 -> +17px    vw 1536 -> +65px
+
+   So below 2xl the title must start *under* the rail; at 2xl and up there is
+   room beside it and the title can rise. A single value either collides on a
+   1280/1366 laptop or wastes the top of a large display.
+
+   Change it here and every page follows.
+*/
+@layer base {
+  :root {
+    --masthead-top: 14rem; /* 224px — clears the rail's ~203px by ~21px */
+  }
+
+  @media (width >= 96rem) {
+    /* 2xl: horizontal clearance exists, so the title sits beside the rail. */
+    :root {
+      --masthead-top: 7rem; /* 112px */
+    }
+  }
+}
+
+@utility masthead-top {
+  padding-top: var(--masthead-top);
+}
+
 @utility glass {
   /* The frosted capsule used by the nav and any floating control. */
   background: var(--color-surface-glass);

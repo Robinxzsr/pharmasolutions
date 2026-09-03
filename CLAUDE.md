@@ -63,6 +63,18 @@ Keep using the existing tokens rather than inventing new shadow values.
 collections in `src/content.config.ts`. Swapping to a CMS later should mean
 changing a loader, not components.
 
+**Never pick a top padding for a new page.** Page titles are positioned in one
+place: `--masthead-top` in `global.css`, consumed by the `masthead-top`
+utility. Use `PageHeader.astro` for the standard title + lede (it handles the
+Section, glow, Container, and h1 scale too); use the `masthead-top` utility
+directly only when the masthead's *content shape* is bespoke, as on
+`protocols/[...slug]`. A hardcoded `pt-*` on a masthead is a bug — every page
+drifting apart is exactly what this replaced.
+
+Anything passed as children to `PageHeader` renders **inside the same band**,
+below the lede. `/protocols` uses that for its card grid so the heading and
+grid share one Section; prose pages leave it empty and follow with their own.
+
 **Match the surrounding file.** Components carry long explanatory comments
 where a decision is non-obvious — that's deliberate, several of them document
 bugs that were fixed the hard way. Don't strip them.
@@ -96,11 +108,13 @@ up.
 **Only `<nav>` is sticky; the logo is not.** The logo scrolls away with the
 page. `position: sticky` on the nav, `top: 0`, no JS.
 
-**The heading top padding on `/protocols` is two values on purpose**
-(`pt-56 2xl:pt-28`). The nav rail's links run to `y≈203`, `x≈167`, and the
-centred content column only clears that horizontally at ~1400px and up
-(measured: 1366 → −20px, 1440 → +17px, 1536 → +65px). One value either
-collides on a 1280/1366 laptop or wastes the top of a large display.
+**`--masthead-top` is two values on purpose.** The nav rail's links run to
+`y≈203`, `x≈167`, and the centred content column only clears that horizontally
+at ~1400px and up (measured: 1366 → −20px, 1440 → +17px, 1536 → +65px). So
+below 2xl the title starts under the rail; at 2xl and up it rises beside it.
+One value either collides on a 1280/1366 laptop or wastes the top of a large
+display. Every page's title used to be `pt-40`, which actively collided at
+1280 — verified before the fix, on `/coaching`.
 
 **Hero asset URLs are passed as `data-` attributes, not `define:vars`.**
 `define:vars` forces the script inline, which loses bundling.

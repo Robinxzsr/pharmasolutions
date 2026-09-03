@@ -9,9 +9,10 @@
  * The link is per-protocol in the content collection, so each guide can get
  * its own once they exist; today they all point at the same one.
  *
- * Top padding matches the listing page's two-value approach, and for the same
- * measured reason: the nav rail runs to y≈203 / x≈167, and centred content
- * only clears it horizontally above ~1400px.
+ * The masthead here is bespoke (back-link, then cover beside title/price/CTA)
+ * rather than the standard title+lede, so it uses the `masthead-top` utility
+ * directly instead of PageHeader. Same single source of truth for the vertical
+ * position either way — see global.css for the measurements behind it.
  */
 import { getCollection, render } from "astro:content";
 import type { GetStaticPaths } from "astro";
@@ -33,7 +34,7 @@ const { Content } = await render(protocol);
 ---
 
 <BaseLayout title={name} description={summary}>
-  <Section space="md" glow="top" class="pt-56 2xl:pt-28">
+  <Section space="md" glow="top" class="masthead-top">
     <Container>
       <a href="/protocols" class="text-sm text-content-muted transition-colors hover:text-chalk">
         &larr; All protocols

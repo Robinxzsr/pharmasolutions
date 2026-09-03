@@ -1,0 +1,49 @@
+---
+/**
+ * PageHeader — a page's title band. The one place a page title's position,
+ * size, and glow are defined, so pages can't drift apart from each other.
+ *
+ * Vertical position comes from the `masthead-top` utility (see global.css for
+ * the measurements behind it) rather than a per-page `pt-*`. Adding a new page
+ * should never involve picking a top padding.
+ *
+ * Anything passed as children renders inside the *same* band, below the lede.
+ * That matters: /protocols puts its card grid here so the heading and grid
+ * share one Section. As two Sections they stacked py-24 on py-24 into 192px of
+ * dead space. Prose pages leave it empty and follow with their own Section,
+ * which is the right call there — body copy wants that separation.
+ */
+import Section from "./Section.astro";
+import Container from "./Container.astro";
+
+interface Props {
+  title: string;
+  /** Optional deck under the title. */
+  lede?: string;
+  /** Container measure. `prose` for text-led pages, `wide` for big grids. */
+  width?: "prose" | "default" | "wide";
+  /** Spacing above children within the band. Ignored when there are none. */
+  contentGap?: "sm" | "md";
+  class?: string;
+}
+
+const { title, lede, width = "default", contentGap = "md", class: className = "" } = Astro.props;
+
+const gapClass = { sm: "mt-8", md: "mt-12" }[contentGap];
+---
+
+<Section space="md" glow="top" class:list={["masthead-top", className]}>
+  <Container width={width}>
+    <h1 class="text-[length:var(--text-display-lg)]">{title}</h1>
+
+    {lede && <p class="mt-4 max-w-xl text-lg text-content-muted">{lede}</p>}
+
+    {
+      Astro.slots.has("default") && (
+        <div class={gapClass}>
+          <slot />
+        </div>
+      )
+    }
+  </Container>
+</Section>

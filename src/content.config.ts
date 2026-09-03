@@ -113,7 +113,7 @@ const protocols = defineCollection({
        * constant so each guide can get its own link (and its own price)
        * without touching a component — they all point at the same one today.
        */
-      checkoutUrl: z.string().url(),
+      checkoutUrl: z.url(),
       /** Cover art. Falls back to a placeholder in ProtocolCard until this exists. */
       cover: image().optional(),
       coverAlt: z.string().optional(),
