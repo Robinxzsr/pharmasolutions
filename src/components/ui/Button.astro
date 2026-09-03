@@ -2,9 +2,25 @@
 /**
  * Button — renders as <a> when given an href, otherwise <button>.
  *
- * Pills everywhere, matching the hero. `primary` is the white capsule from
- * the prototype's CTA; `glow` is the violet variant for moments that should
- * sit in the same light as the pill.
+ * A plain rectangle: flat fill, 1px border, square corners.
+ *
+ * Every variant INVERTS on hover rather than merely tinting. That is the
+ * move the reference sites use, and it is the reason their buttons feel
+ * decisive: the control doesn't warm up by 8%, it commits to a different
+ * state. Each variant inverts toward a different member of the three-colour
+ * palette, so the three of them stay distinguishable while hovered:
+ *
+ *   primary  white slab      ->  blue fill, white label
+ *   glow     blue slab       ->  white fill, blue label
+ *   ghost    outline only    ->  white fill, black label
+ *
+ * Nothing blurs or glows. A control changes which flat colour it is, at
+ * --duration-ui, and that is the whole vocabulary — see the note on the box
+ * material in global.css.
+ *
+ * Labels are uppercase and widely tracked — the CTA treatment from the
+ * reference material, and the same voice as the `label` utility so a button
+ * and a card tag read as the same system.
  */
 interface Props {
   href?: string;
@@ -29,16 +45,25 @@ const {
 const Tag = href ? "a" : "button";
 
 const base =
-  "inline-flex items-center justify-center gap-[11px] rounded-pill leading-none " +
-  "transition-[background-color,color,opacity,box-shadow] duration-[var(--duration-ui)] " +
-  "ease-[var(--ease-out-soft)] disabled:pointer-events-none disabled:opacity-50";
+  "lift inline-flex items-center justify-center gap-[11px] leading-none border " +
+  "font-display font-bold uppercase tracking-[0.1em] disabled:pointer-events-none disabled:opacity-50";
 
-/* NeueBit is the only true bold face available — Mondwest would be
-   synthesised (faux) bold, which smears a pixel typeface. */
+/* `glow` keeps its name for API stability, but it is now simply the solid
+   blue variant: the one filled with brand ink at rest, marking the single
+   primary action on a page (enrol, checkout). */
 const variantClass = {
-  primary: "font-display font-bold bg-chalk text-void-950 hover:opacity-[0.88]",
-  glow: "font-display font-bold bg-violet-500 text-chalk shadow-[var(--shadow-glow-sm)] hover:bg-violet-400",
-  ghost: "font-display font-bold border border-chalk/30 text-chalk hover:border-chalk/55 hover:bg-white/[0.08]",
+  primary:
+    "border-chalk bg-chalk text-void-950 " +
+    "hover:border-brand hover:bg-brand hover:text-chalk " +
+    "focus-visible:border-brand focus-visible:bg-brand focus-visible:text-chalk",
+  glow:
+    "border-brand bg-brand text-chalk " +
+    "hover:border-chalk hover:bg-chalk hover:text-brand " +
+    "focus-visible:border-chalk focus-visible:bg-chalk focus-visible:text-brand",
+  ghost:
+    "border-chalk/35 bg-transparent text-chalk " +
+    "hover:border-chalk hover:bg-chalk hover:text-void-950 " +
+    "focus-visible:border-chalk focus-visible:bg-chalk focus-visible:text-void-950",
 }[variant];
 
 const sizeClass = {

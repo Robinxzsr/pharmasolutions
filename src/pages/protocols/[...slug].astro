@@ -34,7 +34,7 @@ const { Content } = await render(protocol);
 ---
 
 <BaseLayout title={name} description={summary}>
-  <Section space="md" glow="top" class="masthead-top">
+  <Section space="md" class="masthead-top">
     <Container>
       <a href="/protocols" class="text-sm text-content-muted transition-colors hover:text-chalk">
         &larr; All protocols
@@ -43,22 +43,26 @@ const { Content } = await render(protocol);
       <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,20rem)_1fr]">
         {
           cover ? (
-            <Image
-              src={cover}
-              alt={coverAlt ?? ""}
-              widths={[400, 640, 800]}
-              sizes="(min-width: 1024px) 20rem, 90vw"
-              class="aspect-[16/10] w-full rounded-card object-cover"
-            />
+            <div class="border border-border">
+              <Image
+                src={cover}
+                alt={coverAlt ?? ""}
+                widths={[400, 640, 800]}
+                sizes="(min-width: 1024px) 20rem, 90vw"
+                class="aspect-[16/10] w-full object-cover"
+              />
+            </div>
           ) : (
-            <CoverPlaceholder class="aspect-[16/10] w-full rounded-card" />
+            <div class="border border-border">
+              <CoverPlaceholder class="aspect-[16/10] w-full" />
+            </div>
           )
         }
 
         <div>
           <h1 class="text-[length:var(--text-display-md)]">{name}</h1>
           <p class="mt-3 max-w-lg text-lg text-content-muted">{summary}</p>
-          <p class="mt-6 font-display text-2xl font-bold text-brand-soft">{priceDisplay}</p>
+          <p class="mt-6 font-display text-2xl font-bold text-chalk">{priceDisplay}</p>
 
           <Button href={checkoutUrl} variant="glow" size="lg" class="mt-8">Pre-order</Button>
         </div>

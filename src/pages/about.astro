@@ -16,13 +16,15 @@ const coaches = (await getCollection("coaches")).sort((a, b) => a.data.order - b
       coaches.map((coach) => (
         <li>
           {coach.data.portrait && (
-            <Image
-              src={coach.data.portrait}
-              alt={`Portrait of ${coach.data.name}`}
-              width={320}
-              height={320}
-              class="rounded-card"
-            />
+            <div class="border border-border">
+              <Image
+                src={coach.data.portrait}
+                alt={`Portrait of ${coach.data.name}`}
+                width={320}
+                height={320}
+                class="block w-full"
+              />
+            </div>
           )}
           <h3 class="mt-4 font-display text-xl">{coach.data.name}</h3>
           <p class="text-content-muted">{coach.data.role}</p>

@@ -4,47 +4,97 @@
  *
  * Posts to /api/enrol. Works without JS (standard form POST); with JS it
  * submits in place and swaps in a confirmation.
+ *
+ * The form declares `font-body` on its root rather than inheriting. It is
+ * rendered inside PageLayout's `prose-body` container, which sets the
+ * long-form serif — correct for the article pages that container exists for,
+ * wrong for controls. A field label is UI, not reading matter, and it should
+ * speak in the interface's voice no matter what it is nested inside.
  */
+import Button from "../ui/Button.astro";
+
 interface Props {
   class?: string;
 }
 const { class: className = "" } = Astro.props;
 
+/* The border/background live on a WRAPPER, not the control itself, so the
+   focus state can react to `focus-within` — the whole field lights up, not
+   just the text caret inside it. Border and shadow are the standard modern
+   focus signal is the flattest one available: the hairline border goes to
+   solid white. No bloom — see the box-material note in global.css. */
+const shell =
+  "mt-1.5 border border-border bg-surface-raised transition-[border-color,box-shadow] duration-[var(--duration-ui)] " +
+  "ease-[var(--ease-out-soft)] focus-within:border-border-lit";
 const field =
-  "w-full rounded-soft border border-border bg-surface-raised px-4 py-3 text-chalk placeholder:text-content-faint focus:outline-none";
-const label = "block text-sm font-medium";
+  "w-full bg-transparent px-4 py-3 text-[15px] text-chalk placeholder:text-content-faint focus:outline-none";
+/* font-bold is a REAL cut now that Mondwest ships a 700 — this used to be
+   font-medium precisely because bolding Mondwest synthesised and smeared. */
+const label = "block text-sm font-bold";
 ---
 
-<form method="POST" action="/api/enrol" data-enrol-form class:list={["flex flex-col gap-5", className]}>
+<form method="POST" action="/api/enrol" data-enrol-form class:list={["flex flex-col gap-5 font-body", className]}>
   <div>
     <label for="enrol-name" class={label}>Your name</label>
-    <input id="enrol-name" name="name" type="text" required autocomplete="name" class:list={[field, "mt-1.5"]} />
+    <div class={shell}>
+      <input id="enrol-name" name="name" type="text" required autocomplete="name" class={field} />
+    </div>
   </div>
 
   <div>
     <label for="enrol-email" class={label}>Email</label>
-    <input id="enrol-email" name="email" type="email" required autocomplete="email" class:list={[field, "mt-1.5"]} />
+    <div class={shell}>
+      <input id="enrol-email" name="email" type="email" required autocomplete="email" class={field} />
+    </div>
   </div>
 
   <div>
     <label for="enrol-stage" class={label}>Where are you in your studies?</label>
-    <input
-      id="enrol-stage"
-      name="stage"
-      type="text"
-      required
-      placeholder="e.g. 2nd year pharmacy, FY1 doctor"
-      class:list={[field, "mt-1.5"]}
-    />
+    <div class={shell}>
+      <input
+        id="enrol-stage"
+        name="stage"
+        type="text"
+        required
+        placeholder="e.g. 2nd year pharmacy, FY1 doctor"
+        class={field}
+      />
+    </div>
   </div>
 
   <div>
     <label for="enrol-goals" class={label}>What do you want to get out of the program?</label>
-    <textarea id="enrol-goals" name="goals" rows="4" class:list={[field, "mt-1.5 resize-y"]}></textarea>
+    <div class={shell}>
+      <textarea id="enrol-goals" name="goals" rows="4" class:list={[field, "block resize-y"]}></textarea>
+    </div>
   </div>
 
   <label class="flex items-start gap-3 text-sm">
-    <input type="checkbox" name="consent" required class="mt-1" />
+    {/* The OS checkbox is the last rounded, antialiased, blue-when-checked
+        object on the page. Drawn here instead: a plain square box matching
+        every other control, with a tick built from the same pixel-glyph hand
+        as the site's arrows. The real input stays inside the box, transparent
+        and full-size, so it keeps its own semantics, hit target and keyboard
+        behaviour — `has-[:focus-visible]` lifts a glow onto the wrapper since
+        the real outline draws around the invisible input, not the visible box. */}
+    <span
+      class="relative mt-0.5 grid size-[18px] shrink-0 place-items-center border border-border bg-surface-raised transition-[background-color,border-color,box-shadow] duration-[var(--duration-ui)] has-[:checked]:border-brand has-[:checked]:bg-brand has-[:focus-visible]:border-border-lit"
+    >
+      <input type="checkbox" name="consent" required class="peer absolute inset-0 cursor-pointer appearance-none" />
+      <svg
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+        fill="currentColor"
+        class="pointer-events-none size-3 text-chalk opacity-0 transition-opacity duration-[var(--duration-ui)] peer-checked:opacity-100"
+      >
+        <rect x="2" y="7" width="2" height="2"></rect>
+        <rect x="4" y="9" width="2" height="2"></rect>
+        <rect x="6" y="11" width="2" height="2"></rect>
+        <rect x="8" y="9" width="2" height="2"></rect>
+        <rect x="10" y="7" width="2" height="2"></rect>
+        <rect x="12" y="5" width="2" height="2"></rect>
+      </svg>
+    </span>
     <span>
       I agree to the <a href="/legal/privacy" class="underline">privacy policy</a> and to being
       contacted about my application.
@@ -54,12 +104,7 @@ const label = "block text-sm font-medium";
   {/* Honeypot. */}
   <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" class="absolute h-0 w-0 overflow-hidden opacity-0" />
 
-  <button
-    type="submit"
-    class="self-start rounded-pill bg-violet-500 px-8 py-4 font-display font-bold text-chalk shadow-[var(--shadow-glow-sm)] transition-colors duration-[var(--duration-ui)] hover:bg-violet-400 disabled:opacity-50"
-  >
-    Submit application
-  </button>
+  <Button type="submit" variant="glow" size="md" class="self-start">Submit application</Button>
 
   <p data-enrol-status role="status" aria-live="polite" class="min-h-5 text-sm text-content-muted"></p>
 </form>

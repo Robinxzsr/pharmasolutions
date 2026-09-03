@@ -1,28 +1,30 @@
 ---
 /**
- * ProtocolCard — one shop-front tile: cover, name, summary, price. The whole
- * card is the link, not a "view" button inside it — a shop tile should feel
- * like one clickable object, not a text block with a control bolted on. The
- * "View protocol" pill below is a `<span>` styled as a button, not a real
- * one, so it stays a control-free child of that single anchor.
+ * ProtocolCard — one shop-front tile. The whole card is the link, not a
+ * "view" button inside it: a shop tile should feel like one clickable
+ * object, not a text block with a control bolted on. The "View protocol"
+ * button revealed over the cover is a `<span>`, not a real control, so it
+ * stays a child of that single anchor.
+ *
+ * Structurally identical to BlogCard — header band of boxed micro-labels,
+ * cover plate, body — because the two card grids on the site are one system.
+ * See BlogCard.astro, which carries the fuller reasoning for the banding and
+ * for setting the card's text in white alphas rather than muted tokens.
+ *
+ * The price is a boxed label in the header band rather than a line at the
+ * bottom of the body. It reads as the catalogue entry's price tag there, it
+ * is the first thing the eye lands on after the name, and it removes the
+ * alignment problem that made it need `mt-auto` in the first place: a price
+ * sitting in a fixed-height header row is level across every card in a grid
+ * row for free, no matter how long the summaries are.
  *
  * The cover is 16:10, not portrait. A 3:4 cover made a 432x724px card at
- * desktop — too tall to fit even one full row on a 900px viewport. Landscape
- * covers plus tightened type bring it to roughly 344x325, so a full row and
- * the top of the next are both visible.
+ * desktop — too tall to fit even one full row on a 900px viewport.
  *
- * Hover reveals the same three-part moment BlogCard uses on its own cover —
- * a slow image scale, a `halftone` dot screen printed onto the art via
- * `mix-blend-multiply`, and a centered CTA pill — so the two "cover art you
- * can click" moments on the site read as one system. See `halftone` in
- * global.css for why that replaces the site's usual `glass` blur here.
- *
- * The pill's arrow is the same four-rect pixel glyph as the nav's hover
- * arrow (see Header.astro), not the smooth rounded-stroke icon a generic
- * arrow-right would use — same reasoning: hard 90° corners read as one
- * system with the pixel display face, and a round stroke-linecap/linejoin
- * doesn't. No `shape-rendering: crispEdges` here either, for the same
- * measured reason documented on Header.astro's arrow.
+ * HOVER — the panel floods with brand ink and the cover duotones under its
+ * dot screen (`flood` in global.css). The pill's arrow is the same four-rect
+ * pixel glyph as the nav's, not a rounded-stroke icon: hard 90° corners read
+ * as one system with the pixel display face.
  */
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
@@ -38,9 +40,16 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
 
 <a
   href={`/protocols/${protocol.id}`}
-  class="group/card block overflow-hidden rounded-card border border-border bg-surface-raised transition-[border-color,box-shadow] duration-300 ease-out hover:border-violet-500/40 hover:shadow-[var(--shadow-glow-sm)] focus-visible:border-violet-500/40 focus-visible:shadow-[var(--shadow-glow-sm)]"
+  class="group/card flood flex h-full flex-col border border-border bg-surface-raised"
 >
-  <div class="relative overflow-hidden">
+  <div class="flex items-center justify-between gap-3 border-b border-chalk/20 px-4 py-3">
+    <span class="label bg-chalk px-2 py-1 text-void-950">Protocol</span>
+    <span class="label shrink-0 border border-chalk/45 px-2 py-1 text-chalk">{priceDisplay}</span>
+  </div>
+
+  {/* `isolate` keeps the duotone blend inside this box rather than letting it
+      reach the page behind the card. */}
+  <div class="relative isolate shrink-0 overflow-hidden border-b border-chalk/20">
     {
       cover ? (
         <Image
@@ -55,14 +64,16 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
       )
     }
 
-    {/* Halftone screen: dots multiply onto the cover's own tones instead of a flat tint sitting over it. */}
+    {/* Duotone: `mix-blend-color` takes hue and saturation from this flat
+        blue and luminance from the art underneath. */}
     <div
-      class="halftone pointer-events-none absolute inset-0 opacity-0 mix-blend-multiply transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
+      class="pointer-events-none absolute inset-0 bg-brand opacity-0 mix-blend-color transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
     </div>
 
+    {/* Halftone screen: dots multiply onto the art's own tones instead of a flat tint sitting over it. */}
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface/80 to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
+      class="halftone pointer-events-none absolute inset-0 opacity-0 mix-blend-multiply transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
     </div>
 
@@ -70,7 +81,7 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
       class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
       <span
-        class="inline-flex items-center gap-2 rounded-pill border border-border bg-surface/90 px-5 py-2.5 font-display text-sm font-bold text-chalk shadow-[var(--shadow-glow-sm)]"
+        class="inline-flex items-center gap-2 bg-chalk px-5 py-2.5 font-display text-sm font-bold uppercase tracking-[0.1em] text-brand"
       >
         View protocol
         <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]">
@@ -83,9 +94,8 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
     </div>
   </div>
 
-  <div class="p-4">
-    <h2 class="line-clamp-2 text-[length:var(--text-display-sm)] text-chalk">{name}</h2>
-    <p class="mt-1.5 line-clamp-3 text-[13px] leading-snug text-content-muted">{summary}</p>
-    <p class="mt-2.5 font-display text-base font-bold text-brand-soft">{priceDisplay}</p>
+  <div class="flex flex-1 flex-col p-4">
+    <h2 class="line-clamp-2 text-[length:var(--text-display-card)] text-chalk">{name}</h2>
+    <p class="mt-2 line-clamp-3 font-prose text-[13.5px] leading-relaxed text-chalk/75">{summary}</p>
   </div>
 </a>

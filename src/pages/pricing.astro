@@ -8,13 +8,14 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/ui/Section.astro";
 import Container from "../components/ui/Container.astro";
+import Button from "../components/ui/Button.astro";
 import { getCollection } from "astro:content";
 
 const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="Pricing" description="Coaching plans and protocol access.">
-  <Section space="md" glow="top" class="masthead-top">
+  <Section space="md" class="masthead-top">
     <Container>
       <h1 class="text-[length:var(--text-display-lg)]">Pricing</h1>
     </Container>
@@ -27,15 +28,21 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
           plans.map((plan) => (
             <article
               class:list={[
-                "flex flex-col rounded-card border p-8",
+                "flex flex-col border p-8",
+                /* The recommended plan used to carry a border colour AND a
+                   glow at once — two elevation systems stacked on one card.
+                   It is marked by a full-strength white border against
+                   everyone else's hairline — the palette has no glow left to
+                   spend, and a rule is the flattest possible way to say
+                   "this one". */
                 plan.data.highlighted
-                  ? "border-violet-500/50 bg-surface-raised shadow-[var(--shadow-glow-sm)]"
-                  : "border-border bg-surface-raised",
+                  ? "border-chalk"
+                  : "border-border",
               ]}
             >
               <h2 class="text-[length:var(--text-display-sm)]">{plan.data.name}</h2>
               <p class="mt-2 text-content-muted">{plan.data.blurb}</p>
-              <p class="mt-6 text-[length:var(--text-display-sm)] text-brand-soft">
+              <p class="mt-6 text-[length:var(--text-display-sm)] text-chalk">
                 {plan.data.priceDisplay}
               </p>
 
@@ -45,19 +52,15 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
                 ))}
               </ul>
 
-              <button
+              <Button
                 type="button"
+                variant={plan.data.highlighted ? "glow" : "primary"}
+                size="md"
                 data-checkout={plan.data.stripePriceId}
-                class:list={[
-                  "mt-8 rounded-pill px-6 py-3 font-display font-bold transition-[background-color,opacity]",
-                  "duration-[var(--duration-ui)] disabled:opacity-50",
-                  plan.data.highlighted
-                    ? "bg-violet-500 text-chalk hover:bg-violet-400"
-                    : "bg-chalk text-void-950 hover:opacity-[0.88]",
-                ]}
+                class="mt-8"
               >
                 Choose {plan.data.name}
-              </button>
+              </Button>
             </article>
           ))
         }

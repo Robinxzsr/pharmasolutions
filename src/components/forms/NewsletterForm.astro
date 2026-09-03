@@ -1,6 +1,12 @@
 ---
 /**
- * NewsletterForm — the pill-shaped capture from the footer band.
+ * NewsletterForm — the capture bar in the footer band.
+ *
+ * A plain bordered box, not the hero pill's glass — the footer is a solid
+ * region of the page, and a frosted capsule there was borrowing a material
+ * that only means something where it floats over the 3D pill. On focus the
+ * border goes to solid white — the same flat focus signal every field on
+ * the site gives.
  *
  * Posts to /api/newsletter with fetch, falling back to a normal form POST if
  * JS is unavailable. Status is announced via aria-live.
@@ -15,10 +21,10 @@ const { class: className = "" } = Astro.props;
   method="POST"
   action="/api/newsletter"
   data-newsletter-form
-  class:list={["w-full", className]}
+  class:list={["w-full font-body", className]}
 >
   <div
-    class="glass flex items-center gap-2 rounded-pill p-1.5 pl-5"
+    class="flex items-center gap-2 border border-border bg-void-900 p-1.5 pl-5 transition-[border-color,box-shadow] duration-[var(--duration-ui)] ease-[var(--ease-out-soft)] focus-within:border-border-lit"
   >
     <label for="newsletter-email" class="sr-only">Email address</label>
     <input
@@ -41,13 +47,20 @@ const { class: className = "" } = Astro.props;
       class="absolute h-0 w-0 overflow-hidden opacity-0"
     />
 
+    {/* The house arrow, not a second one. This was a rounded-stroke diagonal
+        — the only icon on the site drawn in a different hand from the nav and
+        card glyphs. One icon system: four axis-aligned rects on a 16 grid.
+        Inverts to blue on hover, the same move Button's primary makes. */}
     <button
       type="submit"
-      class="grid size-11 shrink-0 place-items-center rounded-pill bg-chalk text-void-950 transition-opacity duration-[var(--duration-ui)] hover:opacity-[0.88]"
+      class="lift grid size-11 shrink-0 place-items-center border border-chalk bg-chalk text-void-950 hover:border-brand hover:bg-brand hover:text-chalk focus-visible:border-brand focus-visible:bg-brand focus-visible:text-chalk"
     >
       <span class="sr-only">Subscribe</span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M7 17 17 7M17 7H9m8 0v8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+      <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
+        <rect x="1" y="6" width="8" height="4" fill="currentColor"></rect>
+        <rect x="9" y="2" width="2" height="12" fill="currentColor"></rect>
+        <rect x="11" y="4" width="2" height="8" fill="currentColor"></rect>
+        <rect x="13" y="6" width="2" height="4" fill="currentColor"></rect>
       </svg>
     </button>
   </div>

@@ -32,7 +32,7 @@ const { title, lede, width = "default", contentGap = "md", class: className = ""
 const gapClass = { sm: "mt-8", md: "mt-12" }[contentGap];
 ---
 
-<Section space="md" glow="top" class:list={["masthead-top", className]}>
+<Section space="md" class:list={["masthead-top", className]}>
   <Container width={width}>
     <h1 class="text-[length:var(--text-display-lg)]">{title}</h1>
 

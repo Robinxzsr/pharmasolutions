@@ -1,18 +1,39 @@
 ---
 /**
- * BlogCard — one article tile on /blog. Deliberately built as the same shop
- * tile as ProtocolCard (cover, halftone hover reveal, larger display title,
- * three-line clamp, one full-card link) so the two "grid of cover-image
- * cards" moments on the site read as one system rather than two components
- * that happen to look similar — see ProtocolCard.astro and `halftone` in
- * global.css for the reasoning behind the hover treatment itself.
+ * BlogCard — one article tile on /blog, built as the same object as
+ * ProtocolCard so the two card grids on the site read as one system.
  *
- * The footer swaps price for author + date (left) and an estimated read
- * time (right), echoing the tag-badge/byline layout of the glass-card
- * reference this was built from — but the read time is computed from the
- * post's own word count, not invented, and the byline has no fake avatar
- * photo: coaches without a `portrait` get an initial instead, the same
- * "honest placeholder" rule CoverPlaceholder already follows for covers.
+ * STRUCTURE — a banded catalogue card, not a content card.
+ *
+ *   ┌─────────────────────────────┐
+ *   │ [TAG]              [1 MIN]  │  header band: two boxed micro-labels
+ *   ├─────────────────────────────┤
+ *   │         cover plate         │
+ *   ├─────────────────────────────┤
+ *   │ Title                       │
+ *   │ Description                 │
+ *   ├─────────────────────────────┤
+ *   │ [D] Author          Date    │  footer band
+ *   └─────────────────────────────┘
+ *
+ * The bands are the point. A soft stack of title / text / byline separated
+ * only by whitespace is the default blog card every template ships, and it
+ * read as modern here because it is: it belongs to a world of shadows and
+ * generous padding. Ruling the card into labelled compartments instead makes
+ * it an index card — a filed, catalogued object — which is the same world as
+ * the pixel type and the halftone plate. Tags move out of the cover overlay
+ * and into the header band where a catalogue number would go, and the read
+ * time joins them, so the two "at a glance" facts share one row.
+ *
+ * HOVER — the whole panel floods with brand ink (see `flood` in global.css)
+ * and the cover plate duotones blue underneath its dot screen. A press can
+ * run a second solid plate; it cannot make a card glow, and that is exactly
+ * why this fits where an animated border highlight did not.
+ *
+ * All text inside is set in WHITE ALPHAS rather than the muted/faint tokens,
+ * because the card has two grounds — near-black at rest and brand blue on
+ * hover — and a white alpha is legible on both. That is what removes the
+ * need for a group-hover override on every single line of text.
  */
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
@@ -39,11 +60,38 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
 });
 ---
 
-<a
-  href={`/blog/${post.id}`}
-  class="group/card block overflow-hidden rounded-card border border-border bg-surface-raised transition-[border-color,box-shadow] duration-300 ease-out hover:border-violet-500/40 hover:shadow-[var(--shadow-glow-sm)] focus-visible:border-violet-500/40 focus-visible:shadow-[var(--shadow-glow-sm)]"
->
-  <div class="relative overflow-hidden">
+<a href={`/blog/${post.id}`} class="group/card flood flex h-full flex-col border border-border bg-surface-raised">
+  {/* Header band — filled label left, outlined label right, the pairing the
+      reference cards use for "what this is" beside "what it costs you". */}
+  <div class="flex items-center justify-between gap-3 border-b border-chalk/20 px-4 py-3">
+    <div class="flex min-w-0 flex-wrap gap-1.5">
+      {
+        tags.length > 0 ? (
+          tags.slice(0, 2).map((tag) => <span class="label bg-chalk px-2 py-1 text-void-950">{tag}</span>)
+        ) : (
+          <span class="label bg-chalk px-2 py-1 text-void-950">Note</span>
+        )
+      }
+    </div>
+
+    <span class="label flex shrink-0 items-center gap-1.5 border border-chalk/45 px-2 py-1 text-chalk/80">
+      <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3 shrink-0" fill="currentColor">
+        <rect x="6" y="2" width="4" height="1"></rect>
+        <rect x="4" y="3" width="2" height="1"></rect><rect x="10" y="3" width="2" height="1"></rect>
+        <rect x="3" y="4" width="1" height="1"></rect><rect x="12" y="4" width="1" height="1"></rect>
+        <rect x="2" y="5" width="1" height="6"></rect><rect x="13" y="5" width="1" height="6"></rect>
+        <rect x="3" y="11" width="1" height="1"></rect><rect x="12" y="11" width="1" height="1"></rect>
+        <rect x="4" y="12" width="2" height="1"></rect><rect x="10" y="12" width="2" height="1"></rect>
+        <rect x="6" y="13" width="4" height="1"></rect>
+        <rect x="7" y="5" width="1" height="4"></rect><rect x="7" y="8" width="3" height="1"></rect>
+      </svg>
+      {readMinutes} min
+    </span>
+  </div>
+
+  {/* Cover plate. `isolate` keeps the duotone blend inside this box rather
+      than letting it reach the page behind the card. */}
+  <div class="relative isolate shrink-0 overflow-hidden border-b border-chalk/20">
     {
       cover ? (
         <Image
@@ -58,83 +106,61 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
       )
     }
 
-    {/* Halftone screen: dots multiply onto the cover's own tones instead of a flat tint sitting over it. */}
+    {/* Duotone: `mix-blend-color` takes hue and saturation from this flat
+        blue and luminance from the art underneath, so the plate re-inks
+        rather than sitting behind a tinted veil. */}
+    <div
+      class="pointer-events-none absolute inset-0 bg-brand opacity-0 mix-blend-color transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
+    >
+    </div>
+
+    {/* Halftone screen: dots multiply onto the art's own tones instead of a flat tint sitting over it. */}
     <div
       class="halftone pointer-events-none absolute inset-0 opacity-0 mix-blend-multiply transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
     </div>
 
     <div
-      class="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface/80 to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
-    >
-    </div>
-
-    {
-      tags.length > 0 && (
-        <div class="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-          {tags.slice(0, 2).map((tag) => (
-            <span class="rounded-pill border border-border bg-surface/80 px-2.5 py-1 text-[11px] font-display font-bold text-content-muted">
-              {tag}
-            </span>
-          ))}
-        </div>
-      )
-    }
-
-    <div
       class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
       <span
-        class="inline-flex items-center gap-2 rounded-pill border border-border bg-surface/90 px-5 py-2.5 font-display text-sm font-bold text-chalk shadow-[var(--shadow-glow-sm)]"
+        class="inline-flex items-center gap-2 bg-chalk px-5 py-2.5 font-display text-sm font-bold uppercase tracking-[0.1em] text-brand"
       >
         Read article
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4">
-          <path
-            d="M5 12h14M13 6l6 6-6 6"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></path>
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]">
+          <rect x="1" y="6" width="8" height="4" fill="currentColor"></rect>
+          <rect x="9" y="2" width="2" height="12" fill="currentColor"></rect>
+          <rect x="11" y="4" width="2" height="8" fill="currentColor"></rect>
+          <rect x="13" y="6" width="2" height="4" fill="currentColor"></rect>
         </svg>
       </span>
     </div>
   </div>
 
-  <div class="p-4">
-    <h2 class="line-clamp-2 text-[length:var(--text-display-sm)] text-chalk">{title}</h2>
-    <p class="mt-1.5 line-clamp-3 text-[13px] leading-snug text-content-muted">{description}</p>
+  <div class="flex flex-1 flex-col p-4">
+    <h2 class="line-clamp-2 text-[length:var(--text-display-card)] text-chalk">{title}</h2>
+    <p class="mt-2 line-clamp-3 font-prose text-[13.5px] leading-relaxed text-chalk/75">{description}</p>
+  </div>
 
-    <div class="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3">
-      <div class="flex min-w-0 items-center gap-2">
-        {
-          author?.data.portrait ? (
-            <Image
-              src={author.data.portrait}
-              alt=""
-              width={28}
-              height={28}
-              class="size-7 shrink-0 rounded-full border border-border object-cover"
-            />
-          ) : (
-            <span class="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-void-800 font-display text-xs font-bold text-content-muted">
-              {author?.data.name?.[0] ?? "?"}
-            </span>
-          )
-        }
-        <div class="min-w-0 text-[11px] leading-tight">
-          <p class="truncate text-content">{author?.data.name ?? "Unknown"}</p>
-          <p class="text-content-faint">{formattedDate}</p>
-        </div>
-      </div>
-
-      <div class="flex shrink-0 items-center gap-1 text-[11px] text-content-faint">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-3.5">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-          <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-        </svg>
-        {readMinutes} min
-      </div>
+  {/* Footer band. `mt-auto` keeps it on the card's bottom edge whatever the
+      title and description above it did, so the byline lines up across every
+      card in a grid row. */}
+  <div class="mt-auto flex items-center justify-between gap-3 border-t border-chalk/20 px-4 py-3">
+    <div class="flex min-w-0 items-center gap-2.5">
+      {
+        author?.data.portrait ? (
+          <span class="size-7 shrink-0 overflow-hidden border border-chalk/30">
+            <Image src={author.data.portrait} alt="" width={28} height={28} class="size-full object-cover" />
+          </span>
+        ) : (
+          <span class="label flex size-7 shrink-0 items-center justify-center border border-chalk/30 text-chalk/80">
+            {author?.data.name?.[0] ?? "?"}
+          </span>
+        )
+      }
+      <p class="truncate text-xs text-chalk/85">{author?.data.name ?? "Unknown"}</p>
     </div>
+
+    <span class="label shrink-0 text-chalk/70">{formattedDate}</span>
   </div>
 </a>

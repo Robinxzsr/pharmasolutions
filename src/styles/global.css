@@ -9,30 +9,43 @@
 
 @theme {
   /* --- Palette -------------------------------------------------------------
-     Near-black ground, violet as the active/emissive hue, ember as the warm
-     counter-light. Sampled from the hero's three-point lighting rig so the
-     2D UI and the 3D scene agree on the same colours.
+     THREE colours: black, white, and one blue. Nothing else.
+
+     The palette used to run violet AND a warm ember counter-light, which is
+     what made the site read as assembled rather than designed — two accents
+     competing, neither owning anything. Ember is retired and violet is
+     replaced by a single electric blue that every accent on the site now
+     resolves to.
   */
 
-  /* Ground — the black the whole site sits on */
+  /* Ground — the black the whole site sits on. Not neutral: the darks carry
+     a faint blue cast so the ground reads as the same family as the accent
+     rather than as "black, plus a colour that happens to sit on it". */
   --color-void-950: #000000;
-  --color-void-900: #060608;
-  --color-void-800: #0d0d12;
-  --color-void-700: #16161d;
-  --color-void-600: #22222c;
-  --color-void-500: #32323f;
+  --color-void-900: #05060d;
+  --color-void-800: #0b0d18;
+  --color-void-700: #131629;
+  --color-void-600: #1e2238;
+  --color-void-500: #2e3350;
 
-  /* Violet — the pill's emissive, the primary accent */
-  --color-violet-200: #e8dcff;
-  --color-violet-300: #c4a8ff;
-  --color-violet-400: #9d4edd;
-  --color-violet-500: #7c4dff;
-  --color-violet-600: #6a0dad;
+  /* Blue — ONE value, no ramp. There is no blue-300 or blue-400 to reach
+     for, and that is the point.
 
-  /* Ember — the warm rim light; used sparingly as a counterweight */
-  --color-ember-300: #ffb37a;
-  --color-ember-400: #ff8c42;
-  --color-ember-500: #e0662a;
+     A tint ramp existed because #202CDE is too dark to use as TEXT on black
+     (2.5:1, a clear fail), so a pale step got invented to carry accent text
+     — nav links, prices, focus rings. That pale step is a fourth colour: it
+     is not black, not white, and not the brand blue, and it showed up in
+     exactly the places a reader looks first.
+
+     The fix is not a better tint, it's a different rule:
+
+         BLUE IS A FILL. WHITE IS THE LIT STATE.
+
+     Blue is never text on a dark ground — it is the thing text sits ON.
+     Anything that used to go pale-blue to say "active" goes white instead,
+     which is both the higher contrast answer and the one the reference
+     material uses. Text on blue is white; text on white is black. */
+  --color-blue: #202cde;
 
   /* Text — pure white down through the alpha steps the hero uses */
   --color-chalk: #ffffff;
@@ -53,22 +66,30 @@
   --color-content: var(--color-chalk);
   --color-content-muted: var(--color-chalk-muted);
   --color-content-faint: var(--color-chalk-faint);
-  --color-brand: var(--color-violet-500);
-  --color-brand-soft: var(--color-violet-300);
-  --color-accent: var(--color-ember-400);
+  --color-brand: var(--color-blue);
   --color-border: var(--color-edge);
+  /* The border a surface gets when it is active, focused or hovered. White,
+     not blue: see the palette note above — blue fills, white lights up. */
+  --color-border-lit: var(--color-chalk);
 
   /* --- Typography ----------------------------------------------------------
-     Two pixel display faces carry the brand; a real text face carries the
-     paragraphs. NeueBit is the only true bold available — Mondwest would be
-     synthesised bold, which smears a pixel typeface.
+     Three faces, three jobs, no overlap:
 
-     `--font-neuebit` / `--font-mondwest` / `--font-inter` are emitted by the
-     Astro Fonts API (see `fonts` in astro.config.mjs).
+       display  NeueBit, bold pixel — headlines and control labels. Loud.
+       body     Mondwest, pixel — UI copy, meta, labels. Now has a REAL bold
+                cut (700), so the old "never bold Mondwest, it synthesises
+                and smears" rule is retired: `font-bold` on body copy is a
+                genuine weight again.
+       prose    Editorial New — anything you actually sit and READ. The pixel
+                faces are display types and punish at paragraph length; this
+                is the serious voice, and it is the one place on the site
+                that is not trying to be a poster.
+
+     Emitted by the Astro Fonts API (see `fonts` in astro.config.mjs).
   */
   --font-display: var(--font-neuebit);
   --font-body: var(--font-mondwest);
-  --font-prose: var(--font-inter);
+  --font-prose: var(--font-editorial);
 
   /* Fluid display scale — clamp() so oversized headings survive mobile.
      Values carried over from the hero prototype. */
@@ -76,14 +97,17 @@
   --text-display-lg: clamp(34px, 4.2vw, 64px);
   --text-display-md: clamp(26px, 3vw, 44px);
   --text-display-sm: clamp(20px, 2vw, 30px);
+  /* One step above display-sm, reserved for card titles: display-sm reads
+     small once it's competing with the bigger body copy the bitmap cards
+     carry now, but jumping to display-md overruns a ~340px card at max
+     width. This sits between the two. */
+  --text-display-card: clamp(22px, 2.6vw, 32px);
   --text-ui: clamp(11px, 0.88vw, 14px);
 
   /* --- Shape ---------------------------------------------------------------
-     Fully-rounded pills for every interactive control, soft rounding for
-     panels. Nothing is sharp.
+     Everything is a square-cornered box. `--radius-pill` survives only for
+     the nav capsule that floats over the hero; nothing else may use it.
   */
-  --radius-soft: 0.75rem;
-  --radius-card: 1.25rem;
   --radius-pill: 999px;
 
   /* --- Motion --------------------------------------------------------------
@@ -93,12 +117,20 @@
   --duration-reveal: 700ms;
   --duration-ui: 200ms;
 
-  /* --- Glow ----------------------------------------------------------------
-     The 2D echo of the hero's bloom pass, so buttons and panels sit in the
-     same light as the 3D scene.
+  /* --- No glow -------------------------------------------------------------
+     There used to be `--shadow-glow-sm` / `-lg` here: a blurred bloom behind
+     every hovered control, echoing the hero pill.
+
+     They are gone, and nothing replaces them. A soft coloured blur is the
+     single most "modern SaaS" gesture in a UI, and this site is a print
+     object — hard edges, flat inks, no light leaking out of a rectangle. The
+     one thing on the site allowed to glow is the actual 3D pill in the hero,
+     because that is a rendered light source rather than a drawn effect.
+
+     Depth and state are carried by flat colour and rules instead: a control
+     changes what it IS (blue fill, white fill, white border), not how much
+     it is lit.
   */
-  --shadow-glow-sm: 0 0 24px -6px rgb(124 77 255 / 0.45);
-  --shadow-glow-lg: 0 0 80px -12px rgb(124 77 255 / 0.55);
 }
 
 /* ==========================================================================
@@ -147,14 +179,31 @@
     }
   }
 
+  /* Square, not a pill — every control on the site is a plain rectangle, so
+     the focus ring is one too. White rather than blue, for the reason in the
+     palette note: blue is a fill, white is the lit state. It is also simply
+     the higher-contrast ring on a near-black page. */
   :focus-visible {
-    outline: 2px solid var(--color-brand-soft);
+    outline: 2px solid var(--color-chalk);
     outline-offset: 3px;
-    border-radius: var(--radius-pill);
+    border-radius: 0;
+  }
+
+  /* Browser surfaces the design still owns. A blinking 1px system caret in a
+     field set in a pixel face is where the illusion breaks first; a solid
+     white block is what a bitmap terminal actually had. */
+  input,
+  textarea {
+    caret-color: var(--color-chalk);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-void-500) transparent;
   }
 
   ::selection {
-    background: var(--color-violet-500);
+    background: var(--color-brand);
     color: var(--color-chalk);
   }
 }
@@ -226,11 +275,22 @@
 }
 
 @utility prose-body {
-  /* Long-form article copy: real text face, comfortable measure. */
+  /* Long-form article copy: the one place on the site set in a real text
+     face. Editorial New runs optically smaller than the Inter it replaced at
+     an identical px value, and it is a higher-contrast serif, so it needs
+     both a size bump and slightly tighter leading than the old 1rem/1.7 to
+     hold a paragraph together rather than letting the lines drift apart. */
   font-family: var(--font-prose);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 1.0625rem;
+  line-height: 1.65;
   color: var(--color-content-muted);
+
+  /* A serif earns real italics and a real bold — both are shipped cuts now,
+     so nothing here is synthesised. */
+  & strong {
+    font-weight: 700;
+    color: var(--color-content);
+  }
 }
 
 @utility reveal-hidden {
@@ -246,4 +306,93 @@
   transition:
     opacity var(--duration-reveal) var(--ease-out-soft),
     transform var(--duration-reveal) var(--ease-out-soft);
+}
+
+/* ==========================================================================
+   THE BOX MATERIAL
+   ==========================================================================
+
+   Every operable control is a plain rectangle: a border, a flat fill, square
+   corners. No radius, no clip-path, so a real browser focus outline works
+   everywhere.
+
+   ONE interaction rule, and it is a flat one:
+
+       HOVER CHANGES WHAT A THING IS, NOT HOW LIT IT IS.
+
+   A control swaps to a different flat colour — blue fill, white fill, white
+   border. Nothing blurs, nothing glows, nothing travels. The animated
+   gradient streak that used to run around card borders is gone: it was a
+   well-executed version of an effect that belongs to a different kind of
+   site, and it read as modern precisely because it was doing something a
+   printed object cannot do.
+
+   What replaces it on cards is the oldest trick there is — the whole panel
+   floods with ink. See `flood` below.
+   ========================================================================== */
+
+@utility lift {
+  /* The shared "this is live" response for anything operable: one timing, one
+     set of properties, so every control answers at the same speed. The
+     colour change itself is declared per component, because what a control
+     turns INTO is a design decision each one makes; what it must not do is
+     take its own sweet time about it. */
+  transition:
+    border-color var(--duration-ui) var(--ease-out-soft),
+    background-color var(--duration-ui) var(--ease-out-soft),
+    color var(--duration-ui) var(--ease-out-soft),
+    opacity var(--duration-ui) var(--ease-out-soft);
+}
+
+@utility flood {
+  /* The card hover: the entire panel fills with brand ink and every piece of
+     text on it goes white, in one step.
+
+     This is a printing gesture rather than a lighting one. A two-colour press
+     cannot make a panel glow, but it can absolutely run the same plate in
+     solid ink — so the hovered state is not "the card, lit", it is "the card,
+     printed". That is why it sits right next to the halftone plate and the
+     pixel type instead of arguing with them.
+
+     Children opt in by colour-inheriting or by their own `group-hover`
+     classes; the rules inside the card are set in white alphas that hold up
+     on both the near-black rest state and the blue hover state, so they do
+     not need to be re-specified per state. */
+  transition:
+    background-color var(--duration-ui) var(--ease-out-soft),
+    border-color var(--duration-ui) var(--ease-out-soft),
+    color var(--duration-ui) var(--ease-out-soft);
+
+  &:hover,
+  &:focus-visible,
+  &:focus-within {
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-chalk);
+  }
+}
+
+/* ==========================================================================
+   THE MICRO-LABEL
+   ==========================================================================
+
+   The single most repeated element in the reference material: a very small,
+   uppercase, widely-letterspaced tag — section markers, card categories,
+   metadata, statuses. It is what ties a page of otherwise unrelated blocks
+   together, because the same voice keeps reappearing at the same size in
+   the same weight no matter what it is labelling.
+
+   The site had four different treatments for this (11px muted, 12px chalk,
+   uppercase-without-tracking, tracked-without-uppercase). This is now the
+   only one. Tracking is positive and generous — at 11px, uppercase pixel
+   letterforms set solid are a smear.
+   ========================================================================== */
+
+@utility label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }

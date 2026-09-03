@@ -43,21 +43,82 @@ browser just renders an empty list (see Traps).
 
 **Never hardcode a colour.** Every token lives in one `@theme` block in
 `src/styles/global.css`. Components reference the *semantic aliases*
-(`surface`, `content`, `brand`, `accent`, `border`), not the raw ramps
-(`void`, `violet`, `ember`, `chalk`). Re-theming should mean editing the alias
-block only.
+(`surface`, `content`, `brand`, `border`, `border-lit`), not the raw ramps
+(`void`, `blue`, `chalk`). Re-theming should mean editing the alias block only.
 
-**Typography has a hard constraint.** `PP Mondwest` (body) has **no true bold
-cut** — asking for bold synthesises it and visibly smears a pixel typeface.
-`PP NeueBit` (display) is the only face here with a real bold. So: anything
-bold uses `font-display`. Long-form prose uses **Inter** via the `prose-body`
-utility, because both pixel faces are display types and are punishing at
-paragraph length. Inter is only fetched on pages that render prose.
+**The palette is exactly three colours: black, white, and one blue** —
+`#202CDE`, exposed as `--color-blue` and aliased to `brand`. There is no blue
+ramp. There is no `blue-300`. Do not add one.
 
-**The violet glow shadows are the theme, not decoration.** `--shadow-glow-sm`
-/ `-lg` deliberately echo the hero pill's own emissive bloom. A generic
-"shadows need an offset" lint would flag them; that's a false positive here.
-Keep using the existing tokens rather than inventing new shadow values.
+The rule that keeps it at three:
+
+> **Blue is a fill. White is the lit state.**
+
+Blue is never text on a dark ground — it is the thing text sits on. Anything
+saying "active", "hovered" or "focused" goes **white**: nav links, focus
+rings, the caret, lit borders (`--color-border-lit` is chalk). Text on blue
+is white; text on white is black.
+
+This replaced a pale `#8fa3ff` tint that existed to carry accent text,
+because `#202CDE` on black is 2.5:1 and fails. That tint was a fourth colour
+in all but name and it appeared in exactly the places a reader looks first
+(nav, prices). If you hit the same contrast wall, the answer is white or a
+blue *fill behind* white — never a new tint.
+
+The dark ramp carries a faint blue cast on purpose, so the ground is the same
+family as the accent rather than a neutral with a colour sitting on it.
+
+**There are no glow tokens.** `--shadow-glow-sm` / `-lg` are deleted. A
+blurred coloured bloom is the single most "modern SaaS" gesture in a UI and
+this site is a print object. The only thing allowed to glow is the 3D pill in
+the hero, because that is a rendered light source rather than a drawn effect.
+Depth and state come from flat colour and rules.
+
+**The hex values in `pill-scene.ts` are light sources, not palette entries.**
+They are brighter than `#202CDE` and they are deliberately not tokens: a lamp
+pointed at an object is not the ink you would print it in. Do not "fix" them
+to the brand blue — it renders the pill an unlit navy lump.
+
+**Three faces, three jobs.** `font-display` (PP NeueBit, pixel) for headlines
+and control labels. `font-body` (PP Mondwest, pixel) for UI copy, meta and
+labels. `font-prose` (PP Editorial New, serif) for anything a reader actually
+sits and reads — both pixel faces are display types and punish at paragraph
+length. Editorial New replaced Inter: a neutral system sans under two Pangram
+Pangram display cuts read as a fallback nobody ever swapped out.
+
+**Mondwest now ships a REAL bold (700).** The long-standing rule that
+"anything bold must use `font-display`, because bolding Mondwest synthesises
+it and visibly smears a pixel typeface" is **retired** — `font-bold` on body
+copy is a genuine cut again. If you find `font-medium` on a UI label, it is a
+leftover workaround from that era, and 500 still resolves to the 400 cut;
+use `font-bold`.
+
+**Controls must declare `font-body` when they can land inside prose.**
+`PageLayout` wraps its slot in a `prose-body` container, so a form rendered
+through it inherits the long-form serif. That is right for the article pages
+the container exists for and wrong for controls — a field label is UI, not
+reading matter. `EnrolForm` and `NewsletterForm` set `font-body` on their
+roots for exactly this reason; anything similar must too.
+
+**Fonts are documented for humans in `README.md`** ("Changing the fonts") —
+which file registers a family, which token points a role at it, and why
+`prose-body` leaks into forms. Point people there rather than re-explaining.
+
+**Small uppercase text is the `label` utility, not a one-off.** Section
+markers, card tags, statuses, meta — one 11px tracked uppercase treatment,
+defined once in `global.css`. Four slightly different versions of it is what
+"disjointed" looked like.
+
+**Hover changes what a thing IS, not how lit it is.** One rule, site-wide.
+Buttons invert to a different flat colour (`primary` → blue, `glow` → white,
+`ghost` → white). Cards use the `flood` utility: the whole panel fills with
+brand ink and the cover art duotones blue under its halftone screen. Fields
+take a solid white border. Nothing blurs, nothing travels, nothing pulses.
+
+An animated gradient streak used to run around card borders. It was well
+built and it was wrong — it read as modern precisely because it did something
+a printed object cannot do. If a hover needs more presence, give it more ink,
+not more light.
 
 **Repeatable content goes in `src/content/`**, never inline in a page. Typed
 collections in `src/content.config.ts`. Swapping to a CMS later should mean
@@ -66,7 +127,7 @@ changing a loader, not components.
 **Never pick a top padding for a new page.** Page titles are positioned in one
 place: `--masthead-top` in `global.css`, consumed by the `masthead-top`
 utility. Use `PageHeader.astro` for the standard title + lede (it handles the
-Section, glow, Container, and h1 scale too); use the `masthead-top` utility
+Section, Container, and h1 scale too); use the `masthead-top` utility
 directly only when the masthead's *content shape* is bespoke, as on
 `protocols/[...slug]`. A hardcoded `pt-*` on a masthead is a bug — every page
 drifting apart is exactly what this replaced.
@@ -132,7 +193,7 @@ pill's look — material, lights and bloom together, because they only make
 sense tuned against each other.
 
 **The usable bloom range is narrow.** Both ends have been hit:
-`bloomThreshold: 0.12` + `bloomRadius: 1.0` floods the entire hero violet and
+`bloomThreshold: 0.12` + `bloomRadius: 1.0` floods the entire hero blue and
 the pill loses its form; `bloomThreshold: 0.3` drops below the pill's
 luminance and the glow vanishes entirely, leaving it flat matte. Move
 threshold in steps of ~0.02.
@@ -223,10 +284,14 @@ front, or the adapter switched to `middleware` mode.
 
 Blocking launch:
 
-- **Font licence.** `PP NeueBit` and `PP Mondwest` are commercial Pangram
-  Pangram faces. The `.woff2` files are committed and served publicly — this
-  needs a paid web licence. Swapping `--font-display` / `--font-body` in
-  `global.css` is the escape hatch.
+- **Font licence.** `PP NeueBit`, `PP Mondwest` and `PP Editorial New` are all
+  commercial Pangram Pangram faces. The `.woff2` files are committed and served
+  publicly — this needs a paid web licence, and Editorial New adds a third
+  family to whatever is bought. Swapping `--font-display` / `--font-body` /
+  `--font-prose` in `global.css` is the escape hatch. Editorial New was
+  supplied as OTF and converted to woff2 with fonttools; only Regular, Italic
+  and Ultrabold are registered in `astro.config.mjs`, but all six cuts are in
+  `src/assets/fonts/` if more are wanted later.
 - **All copy is placeholder**, including every `src/content/` entry and the
   protocol prices.
 - **Legal pages are stubs** and need writing plus review.
