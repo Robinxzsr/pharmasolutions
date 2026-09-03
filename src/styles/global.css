@@ -207,6 +207,17 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+@utility halftone {
+  /* Print-style dot screen — the shop/blog card hover reveal, used in place
+     of `glass` there on purpose: a cover image is the point of those cards,
+     and a blur veils it instead of revealing it. `mix-blend-multiply` (set
+     alongside this utility, not baked in, so callers keep control of when it
+     blends) prints the dots straight onto the art's own tones rather than
+     laying a flat tint over it, so it reads as an actual halftone screen. */
+  background-image: radial-gradient(circle at center, var(--color-void-950) 0.9px, transparent 1px);
+  background-size: 5px 5px;
+}
+
 @utility full-bleed {
   /* Escapes any centred container to span the viewport. */
   width: 100vw;
