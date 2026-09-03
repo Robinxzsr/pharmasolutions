@@ -11,9 +11,12 @@
  * the top of the next are both visible.
  *
  * The corner arrow is the same glyph and reveal mechanic as the vertical
- * nav's hover state (same path, same translate-in), reused deliberately so
- * the two "hover reveals an arrow" moments on the site read as one system
- * rather than two different affordances that happen to look similar.
+ * nav's hover state (same four-rect pixel arrow, same translate-in), reused
+ * deliberately so the two "hover reveals an arrow" moments on the site read
+ * as one system rather than two different affordances that happen to look
+ * similar. It's built from axis-aligned rects rather than a stroked path so
+ * its edges stay as hard as the pixel display face's, instead of the smooth
+ * rounded joins a generic icon stroke would carry.
  */
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
@@ -53,18 +56,15 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
     </div>
 
     <svg
-      viewBox="0 0 24 24"
-      fill="none"
+      viewBox="0 0 16 16"
+      shape-rendering="crispEdges"
       aria-hidden="true"
-      class="mt-0.5 size-4 shrink-0 -translate-x-2 text-content-faint opacity-0 transition-[transform,opacity,color] duration-300 ease-out group-hover/card:translate-x-0 group-hover/card:text-brand-soft group-hover/card:opacity-100 group-focus-visible/card:translate-x-0 group-focus-visible/card:text-brand-soft group-focus-visible/card:opacity-100"
+      class="mt-1 size-3.5 shrink-0 -translate-x-2 text-content-faint opacity-0 transition-[transform,opacity,color] duration-300 ease-out group-hover/card:translate-x-0 group-hover/card:text-brand-soft group-hover/card:opacity-100 group-focus-visible/card:translate-x-0 group-focus-visible/card:text-brand-soft group-focus-visible/card:opacity-100"
     >
-      <path
-        d="M5 12h14M13 6l6 6-6 6"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></path>
+      <rect x="1" y="6" width="8" height="4" fill="currentColor"></rect>
+      <rect x="9" y="2" width="2" height="12" fill="currentColor"></rect>
+      <rect x="11" y="4" width="2" height="8" fill="currentColor"></rect>
+      <rect x="13" y="6" width="2" height="4" fill="currentColor"></rect>
     </svg>
   </div>
 </a>

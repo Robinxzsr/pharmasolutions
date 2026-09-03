@@ -12,6 +12,18 @@
  * users), which is pure CSS transform + opacity on a named group. Always
  * fully transparent — no background, no scroll-triggered state to track.
  *
+ * The hover arrow is four axis-aligned <rect>s, not a stroked path: a round
+ * stroke-linecap/linejoin reads as a generic UI icon next to a pixel display
+ * face that's deliberately never antialiased (see global.css). Flat filled
+ * rects with hard 90° corners match the font's own hard edges instead of
+ * fighting them. It also carries a permanent `translate-y-[0.06em]`: the
+ * icon's own box centers correctly under `items-center`, but PP NeueBit's
+ * cap-height sits a couple of px below that box's geometric center (measured
+ * via canvas actualBoundingBoxAscent/Descent — ascent 17px, descent ~0 for
+ * caps, against a taller line box), so a geometrically-centered icon reads as
+ * sitting slightly high next to the letters. The nudge is in `em`, not `px`,
+ * so it scales with the same clamp() the link's font-size uses.
+ *
  * Nav links are set in NeueBit rather than bold Mondwest: Mondwest has no
  * true bold weight, so asking for it synthesises (faux-bolds) the face,
  * which smears a pixel typeface. NeueBit is the only face here with a real
@@ -89,23 +101,20 @@ const isActive = (href: string) =>
                 ]}
               >
                 <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
+                  viewBox="0 0 16 16"
+                  shape-rendering="crispEdges"
                   aria-hidden="true"
                   class:list={[
-                    "size-[0.72em] shrink-0 transition-[transform,opacity] duration-300 ease-out",
+                    "size-[0.8em] shrink-0 translate-y-[0.06em] transition-[transform,opacity] duration-300 ease-out",
                     "group-hover/nav:translate-x-0 group-hover/nav:opacity-100",
                     "group-focus-visible/nav:translate-x-0 group-focus-visible/nav:opacity-100",
                     active ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
                   ]}
                 >
-                  <path
-                    d="M5 12h14M13 6l6 6-6 6"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ></path>
+                  <rect x="1" y="6" width="8" height="4" fill="currentColor"></rect>
+                  <rect x="9" y="2" width="2" height="12" fill="currentColor"></rect>
+                  <rect x="11" y="4" width="2" height="8" fill="currentColor"></rect>
+                  <rect x="13" y="6" width="2" height="4" fill="currentColor"></rect>
                 </svg>
 
                 <span
