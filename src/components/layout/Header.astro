@@ -1,12 +1,16 @@
 ---
 /**
- * Header — logo scrolls away with the page; the nav list below it stays
- * pinned to the viewport.
+ * Header — logo top-left, nav below it. True sticky: both scroll normally
+ * with the page at first; once <nav> would scroll past the top of the
+ * viewport, it catches there and stays while the rest of the page keeps
+ * moving underneath it. Scrolling back up releases it just as smoothly —
+ * that's native `position: sticky`, not something built by hand, so there's
+ * no synthetic toggle that could ever jump or flicker on the way back.
  *
- * No JS at all: the arrow-in / label-shift hover state (and its
- * focus-visible equivalent, for keyboard users) is pure CSS transform +
- * opacity on a named group. Always fully transparent — no background, no
- * scroll-triggered state to track.
+ * No JS at all: neither the stick/release above, nor the arrow-in /
+ * label-shift hover state (and its focus-visible equivalent, for keyboard
+ * users), which is pure CSS transform + opacity on a named group. Always
+ * fully transparent — no background, no scroll-triggered state to track.
  *
  * Nav links are set in NeueBit rather than bold Mondwest: Mondwest has no
  * true bold weight, so asking for it synthesises (faux-bolds) the face,
@@ -29,27 +33,26 @@
  * with left-aligned text, but real: it enlarges each link's actual hit
  * target (and hover trigger) to span almost the entire header row, so
  * hovering empty space far to the right of "Protocols" was lighting it up.
- * The logo itself no longer sits in a flex container at all (see below), so
- * it doesn't need the same guard — `inline-block` on a plain block sibling
- * genuinely shrink-wraps, none of that blockification applies.
  *
- * Only <nav> is `position: fixed`; the logo stays on the header's
- * `absolute` (document-anchored, so it scrolls away with the page — just
- * without occupying layout space, which is what keeps the hero flush
- * against the top of the viewport). <nav> deliberately sets no top/left of
- * its own: a fixed element with `inset: auto` keeps its "static position" —
- * where it would have landed in normal flow — so it lands exactly below the
- * logo with no manual offset math, then simply stays there once the page
- * scrolls out from under it.
+ * For `<nav>` to genuinely scroll-then-stick, it has to be a real in-flow
+ * element again — `position: sticky` on an out-of-flow ancestor does
+ * nothing. BaseLayout puts this <header> and <main> in the same CSS grid
+ * cell (both col/row-start-1) so header can overlay the top of the page
+ * without needing to know its own height, which the fluid clamp()
+ * typography here makes genuinely variable — a fixed negative-margin
+ * overlap would drift at in-between viewport widths.
  *
- * That only works because the logo and <nav> are plain block siblings, NOT
- * flex items: for an out-of-flow child of a FLEX container specifically,
- * the spec has it compute its static position as if it were the container's
- * only child, ignoring any actual preceding sibling — confirmed by
- * measuring it, nav landed exactly on top of the logo instead of below it.
- * Plain block flow doesn't have that carve-out, so switching to it (logo:
- * `block`, spaced by its own `mb-0.5` instead of a flex `gap`) is what
- * makes nav's static position honour the logo's real height.
+ * <header> is left to take the grid default of stretching to the *height*
+ * of that shared cell — i.e. main's full page height — rather than
+ * collapsing to just its own content (logo + nav). That's not optional:
+ * a sticky element can never remain stuck past the bottom edge of its own
+ * containing block, so a header that collapsed to ~225px of content height
+ * would release <nav> back into normal flow the moment the page scrolled
+ * past that — confirmed by watching it happen. `pointer-events-none` on
+ * header plus `pointer-events-auto` on just the logo and <nav> is what
+ * makes a header that now spans the entire page safe: its own (invisible,
+ * background-less) box can't intercept clicks meant for whatever's
+ * underneath it outside the logo/nav column, at any scroll position.
  */
 import { primaryNav, site } from "../../lib/site";
 
@@ -58,15 +61,17 @@ const isActive = (href: string) =>
   href === "/" ? currentPath === "/" : currentPath.startsWith(href);
 ---
 
-<header class="absolute inset-x-0 top-0 z-40 px-[18px] py-4 md:px-[34px] md:py-[22px]">
+<header
+  class="pointer-events-none col-start-1 row-start-1 z-40 px-[18px] py-4 md:px-[34px] md:py-[22px]"
+>
   <a
     href="/"
-    class="mb-0.5 inline-block text-[clamp(22px,2.6vw,34px)] leading-none tracking-[-0.01em] text-chalk"
+    class="pointer-events-auto mb-0.5 inline-block text-[clamp(22px,2.6vw,34px)] leading-none tracking-[-0.01em] text-chalk"
   >
     {site.name}
   </a>
 
-  <nav aria-label="Primary" class="fixed z-50">
+  <nav aria-label="Primary" class="pointer-events-auto sticky top-0 z-50">
     <ul class="flex flex-col items-start gap-0.5">
       {
         primaryNav.map((link) => {

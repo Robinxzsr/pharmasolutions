@@ -70,11 +70,29 @@ const socialImage = new URL(ogImage ?? "/og-default.png", Astro.site ?? site.url
       Skip to content
     </a>
 
-    <Header />
+    {/*
+      Header and main share one grid cell (both col/row-start-1) so Header
+      overlays the top of main's content without needing to know its own
+      height in advance — the fluid clamp() typography in Header makes that
+      height genuinely variable, so a fixed negative-margin overlap trick
+      would drift at in-between viewport widths. The cell's own size is
+      governed by main (far taller, as it holds the whole page), and Header
+      simply paints on top of main's top edge via z-index.
 
-    <main id="main">
-      <slot />
-    </main>
+      This is also what makes Header's own <nav> a real in-flow element
+      again, so its `position: sticky` behaves like sticky is supposed to:
+      scrolling normally at first, then catching at `top: 0` once it would
+      scroll past it — instead of the always-pinned-from-load `fixed`
+      approach from the last two commits, which wasn't actually what was
+      wanted.
+    */}
+    <div class="grid">
+      <Header />
+
+      <main id="main" class="col-start-1 row-start-1">
+        <slot />
+      </main>
+    </div>
 
     <Footer />
   </body>
