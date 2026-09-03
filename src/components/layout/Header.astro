@@ -15,6 +15,22 @@
  * stays on its original face/weight (Mondwest, normal) — bolding it read as
  * a size increase even though the metrics are within a few percent.
  *
+ * The logo's font-size intentionally matches the nav links' clamp() exactly
+ * (same min/preferred/max) rather than keeping its old, much smaller scale —
+ * at the old size it read as visibly undersized next to the big bold list
+ * beneath it. Same physical scale, different weight, is what actually
+ * creates hierarchy here: the wordmark stays quiet through weight alone
+ * rather than through being conspicuously smaller too.
+ *
+ * `items-start` on both flex columns (this one and the <ul> below) is load-
+ * bearing, not decorative: a flex item's outer display blockifies (an
+ * `inline-block` child silently computes to `block`), and the container's
+ * default `align-items: stretch` then stretches every child — logo and nav
+ * links alike — to the column's full width. Invisible with left-aligned
+ * text, but real: it enlarges each link's actual hit target (and hover
+ * trigger) to span almost the entire header row, so hovering empty space
+ * far to the right of "Protocols" was lighting it up.
+ *
  * Logo-to-first-link spacing and inter-link spacing share one `gap-0.5`
  * value rather than a hand-matched margin, so they can't drift apart again:
  * the logo and the <nav> are both flex children of the same column, and the
@@ -28,16 +44,16 @@ const isActive = (href: string) =>
 ---
 
 <header class="absolute inset-x-0 top-0 z-50 px-[18px] py-4 md:px-[34px] md:py-[22px]">
-  <div class="flex flex-col gap-0.5">
+  <div class="flex flex-col items-start gap-0.5">
     <a
       href="/"
-      class="inline-block text-[clamp(15px,1.35vw,21px)] leading-none tracking-[-0.01em] text-chalk"
+      class="text-[clamp(22px,2.6vw,34px)] leading-none tracking-[-0.01em] text-chalk"
     >
       {site.name}
     </a>
 
     <nav aria-label="Primary">
-      <ul class="flex flex-col gap-0.5">
+      <ul class="flex flex-col items-start gap-0.5">
         {
           primaryNav.map((link) => {
             const active = isActive(link.href);
