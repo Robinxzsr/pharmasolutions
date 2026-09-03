@@ -1,5 +1,15 @@
 ---
-import PageLayout from "../../layouts/PageLayout.astro";
+/**
+ * Blog — the article index. A grid of cover-image cards, same shape as the
+ * /protocols shop front (see the comment there): PageHeader directly on
+ * BaseLayout, with the grid as PageHeader's children, so the heading and
+ * grid share one Section instead of stacking py-24 on py-24. Grid classes
+ * are copied verbatim from protocols.astro — same gap, same breakpoints,
+ * same card size — so the two grids read as one layout system.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHeader from "../../components/ui/PageHeader.astro";
+import BlogCard from "../../components/blog/BlogCard.astro";
 import { getCollection } from "astro:content";
 
 /** Drafts never ship to production; they stay visible in dev. */
@@ -8,26 +18,22 @@ const posts = (await getCollection("blog", ({ data }) => import.meta.env.DEV || 
 );
 ---
 
-<PageLayout title="Resources" lede="Notes on pharmacology, teaching, and how to actually retain any of it.">
-  {posts.length === 0 && <p class="text-content-muted">No articles yet.</p>}
-
-  <ul class="not-prose flex flex-col gap-10">
+<BaseLayout
+  title="Resources"
+  description="Notes on pharmacology, teaching, and how to actually retain any of it."
+>
+  <PageHeader
+    title="Resources"
+    lede="Notes on pharmacology, teaching, and how to actually retain any of it."
+  >
     {
-      posts.map((post) => (
-        <li>
-          <time datetime={post.data.publishedAt.toISOString()} class="text-sm text-content-muted">
-            {post.data.publishedAt.toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </time>
-          <h2 class="mt-1 text-[length:var(--text-display-sm)]">
-            <a href={`/blog/${post.id}`} class="hover:text-brand-soft">{post.data.title}</a>
-          </h2>
-          <p class="mt-2 text-content-muted">{post.data.description}</p>
-        </li>
-      ))
+      posts.length === 0 ? (
+        <p class="text-content-muted">No articles yet.</p>
+      ) : (
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => <BlogCard post={post} />)}
+        </div>
+      )
     }
-  </ul>
-</PageLayout>
+  </PageHeader>
+</BaseLayout>

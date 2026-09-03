@@ -1,9 +1,11 @@
 ---
 /**
- * CoverPlaceholder — stand-in cover art for a protocol with no `cover` image
- * yet (currently: all of them). A wash of the hero's own violet echoed at
- * low intensity, plus a plain image glyph — not a fake illustration, just
- * an honest "art goes here" marker until real covers exist.
+ * CoverPlaceholder — stand-in cover art for anything shown as a cover-image
+ * card (protocols, blog posts) that has no `cover` image yet. A wash of the
+ * hero's own violet echoed at low intensity, plus a plain image glyph — not
+ * a fake illustration, just an honest "art goes here" marker until real
+ * covers exist. Shared between ProtocolCard and BlogCard so both fall back
+ * the same way.
  */
 interface Props {
   class?: string;
