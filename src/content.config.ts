@@ -108,6 +108,12 @@ const protocols = defineCollection({
       /** One-line shop-card description. */
       summary: z.string(),
       priceDisplay: z.string(),
+      /**
+       * Stripe Payment Link. Per-protocol rather than a single shared
+       * constant so each guide can get its own link (and its own price)
+       * without touching a component — they all point at the same one today.
+       */
+      checkoutUrl: z.string().url(),
       /** Cover art. Falls back to a placeholder in ProtocolCard until this exists. */
       cover: image().optional(),
       coverAlt: z.string().optional(),

@@ -4,6 +4,20 @@
  * linking through to its own detail page. Not routed through PageLayout:
  * PageLayout's second band is a narrow prose Container, wrong measure for a
  * card grid.
+ *
+ * Heading and grid share ONE Section and ONE Container width. They used to be
+ * two Sections, which stacked py-24 on py-24 into 192px of dead space between
+ * the lede and the first card, and used different Container widths, so the
+ * heading started at x=177 while the cards started at x=40 — the two halves of
+ * the page didn't even share a left edge.
+ *
+ * The top padding is two values on purpose. The nav rail's links occupy down
+ * to y≈203 and out to x≈167, and the centred content column only clears that
+ * horizontally at roughly 1400px wide and up (measured: 1366 -> -20px,
+ * 1440 -> +17px, 1536 -> +65px). So below 2xl the heading has to start under
+ * the rail, and only above it can the heading rise to sit alongside the rail.
+ * A single value would either collide on a 1280/1366 laptop or waste the top
+ * of the screen on a large display.
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/ui/Section.astro";
@@ -18,18 +32,14 @@ const protocols = (await getCollection("protocols")).sort((a, b) => a.data.order
   title="Protocols"
   description="One time purchase for the most detailed guides on the market."
 >
-  <Section space="md" glow="top" class="pt-40">
+  <Section space="md" glow="top" class="pt-56 2xl:pt-28">
     <Container>
       <h1 class="text-[length:var(--text-display-lg)]">Protocols</h1>
-      <p class="mt-5 max-w-xl text-lg text-content-muted">
+      <p class="mt-4 max-w-xl text-lg text-content-muted">
         One time purchase for the most detailed guides on the market.
       </p>
-    </Container>
-  </Section>
 
-  <Section space="md">
-    <Container width="wide">
-      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {protocols.map((protocol) => <ProtocolCard protocol={protocol} />)}
       </div>
     </Container>

@@ -1,8 +1,14 @@
 ---
 /**
- * ProtocolCard — one shop-front tile: cover, name, price. The whole card is
- * the link, not a "view" button inside it — a shop tile should feel like one
- * clickable object, not a text block with a control bolted on.
+ * ProtocolCard — one shop-front tile: cover, name, summary, price. The whole
+ * card is the link, not a "view" button inside it — a shop tile should feel
+ * like one clickable object, not a text block with a control bolted on. (It
+ * also keeps the markup free of a button nested inside an anchor.)
+ *
+ * The cover is 16:10, not portrait. A 3:4 cover made a 432x724px card at
+ * desktop — too tall to fit even one full row on a 900px viewport. Landscape
+ * covers plus tightened type bring it to roughly 344x325, so a full row and
+ * the top of the next are both visible.
  *
  * The corner arrow is the same glyph and reveal mechanic as the vertical
  * nav's hover state (same path, same translate-in), reused deliberately so
@@ -30,27 +36,27 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
       <Image
         src={cover}
         alt={coverAlt ?? ""}
-        widths={[320, 480, 640]}
-        sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 90vw"
-        class="aspect-[3/4] w-full object-cover"
+        widths={[320, 480, 720]}
+        sizes="(min-width: 1024px) 344px, (min-width: 640px) 45vw, 90vw"
+        class="aspect-[16/10] w-full object-cover"
       />
     ) : (
-      <CoverPlaceholder class="aspect-[3/4] w-full" />
+      <CoverPlaceholder class="aspect-[16/10] w-full" />
     )
   }
 
-  <div class="flex items-start justify-between gap-3 p-5">
-    <div>
-      <h2 class="font-display text-lg font-bold leading-tight text-chalk">{name}</h2>
-      <p class="mt-1.5 text-sm text-content-muted">{summary}</p>
-      <p class="mt-3 font-display text-lg font-bold text-brand-soft">{priceDisplay}</p>
+  <div class="flex items-start justify-between gap-3 p-4">
+    <div class="min-w-0">
+      <h2 class="font-display text-base font-bold leading-tight text-chalk">{name}</h2>
+      <p class="mt-1 line-clamp-2 text-[13px] leading-snug text-content-muted">{summary}</p>
+      <p class="mt-2.5 font-display text-base font-bold text-brand-soft">{priceDisplay}</p>
     </div>
 
     <svg
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
-      class="mt-1 size-5 shrink-0 -translate-x-2 text-content-faint opacity-0 transition-[transform,opacity,color] duration-300 ease-out group-hover/card:translate-x-0 group-hover/card:text-brand-soft group-hover/card:opacity-100 group-focus-visible/card:translate-x-0 group-focus-visible/card:text-brand-soft group-focus-visible/card:opacity-100"
+      class="mt-0.5 size-4 shrink-0 -translate-x-2 text-content-faint opacity-0 transition-[transform,opacity,color] duration-300 ease-out group-hover/card:translate-x-0 group-hover/card:text-brand-soft group-hover/card:opacity-100 group-focus-visible/card:translate-x-0 group-focus-visible/card:text-brand-soft group-focus-visible/card:opacity-100"
     >
       <path
         d="M5 12h14M13 6l6 6-6 6"

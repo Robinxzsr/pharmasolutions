@@ -2,6 +2,7 @@
 name: Treating Social Dysfunction in ASD
 summary: A pharmacological and behavioural framework for social function in autism.
 priceDisplay: "$59"
+checkoutUrl: "https://buy.stripe.com/bJebIV8JF9vnfj67XYefC00"
 order: 2
 ---
 
