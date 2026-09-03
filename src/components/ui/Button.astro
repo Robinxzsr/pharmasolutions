@@ -2,9 +2,19 @@
 /**
  * Button — renders as <a> when given an href, otherwise <button>.
  *
- * Pills everywhere, matching the hero. `primary` is the white capsule from
- * the prototype's CTA; `glow` is the violet variant for moments that should
- * sit in the same light as the pill.
+ * Cut from the `bitmap` material (see global.css), not the hero pill's glass:
+ * corners resolve on the pixel grid, and hover is carried by the halftone
+ * screen rather than by a glow. At rest every variant is a clean flat slab;
+ * on hover a dot screen prints onto its face and the ink edge lights. That is
+ * how tone works on the hero plate — same dots, printed fatter — so the
+ * control reads as part of the same plate instead of hovering above it.
+ *
+ * Dot colour is chosen per variant so the screen always moves contrast the
+ * safe way. On the white slab the dots are black and on violet they are black
+ * too: the field screens *down* under light text, so the label gets more
+ * contrast as the button lights up, never less. `ghost` screens up in violet
+ * rather than white for the same reason — a growing white screen behind white
+ * type is the one combination that loses legibility.
  */
 interface Props {
   href?: string;
@@ -29,16 +39,33 @@ const {
 const Tag = href ? "a" : "button";
 
 const base =
-  "inline-flex items-center justify-center gap-[11px] rounded-pill leading-none " +
-  "transition-[background-color,color,opacity,box-shadow] duration-[var(--duration-ui)] " +
-  "ease-[var(--ease-out-soft)] disabled:pointer-events-none disabled:opacity-50";
+  "bitmap group/btn inline-flex items-center justify-center gap-[11px] leading-none " +
+  "font-display font-bold disabled:pointer-events-none disabled:opacity-50 " +
+  /* Dots only ever grow on a pointer that can actually hover; on touch the
+     rest state is the whole story and a stuck hover would be a lie. */
+  "hover:[--dot-r:0.95px] focus-visible:[--dot-r:0.95px]";
 
 /* NeueBit is the only true bold face available — Mondwest would be
    synthesised (faux) bold, which smears a pixel typeface. */
 const variantClass = {
-  primary: "font-display font-bold bg-chalk text-void-950 hover:opacity-[0.88]",
-  glow: "font-display font-bold bg-violet-500 text-chalk shadow-[var(--shadow-glow-sm)] hover:bg-violet-400",
-  ghost: "font-display font-bold border border-chalk/30 text-chalk hover:border-chalk/55 hover:bg-white/[0.08]",
+  primary:
+    "text-void-950 [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] " +
+    "[--bitmap-dot:var(--color-void-950)]",
+  glow:
+    "text-chalk [--bitmap-ink:var(--color-violet-500)] [--bitmap-fill:var(--color-violet-500)] " +
+    "[--bitmap-dot:var(--color-void-950)] hover:[--bitmap-ink:var(--color-violet-300)] " +
+    "focus-visible:[--bitmap-ink:var(--color-violet-300)]",
+  /* The fill is a low-alpha black, not fully transparent: the ink is painted
+     by the element itself and the fill layer is what covers it, so a truly
+     transparent fill lets the ink flood the whole face instead of leaving a
+     1px frame. It earns its keep besides — ghost is the variant that sits over
+     the hero's bloom, where white type on bare violet is the weakest contrast
+     on the site, and the wash gives the label a floor. Over the black pages it
+     is invisible, so ghost still reads as outline-only everywhere else. */
+  ghost:
+    "text-chalk [--bitmap-ink:rgb(255_255_255/0.3)] [--bitmap-fill:rgb(0_0_0/0.35)] " +
+    "[--bitmap-dot:var(--color-violet-500)] hover:[--bitmap-ink:var(--color-chalk)] " +
+    "focus-visible:[--bitmap-ink:var(--color-chalk)]",
 }[variant];
 
 const sizeClass = {

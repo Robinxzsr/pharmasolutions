@@ -38,7 +38,7 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
 
 <a
   href={`/protocols/${protocol.id}`}
-  class="group/card block overflow-hidden rounded-card border border-border bg-surface-raised transition-[border-color,box-shadow] duration-300 ease-out hover:border-violet-500/40 hover:shadow-[var(--shadow-glow-sm)] focus-visible:border-violet-500/40 focus-visible:shadow-[var(--shadow-glow-sm)]"
+  class="group/card bitmap block p-0.5 [--bitmap-step:4px] [--bitmap-ink-w:2px] [--bitmap-fill:var(--color-surface-raised)] transition-colors duration-300 ease-out hover:[--bitmap-ink:var(--color-violet-500)] focus-visible:[--bitmap-ink:var(--color-brand-soft)]"
 >
   <div class="relative overflow-hidden">
     {
@@ -70,7 +70,7 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
       class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
       <span
-        class="inline-flex items-center gap-2 rounded-pill border border-border bg-surface/90 px-5 py-2.5 font-display text-sm font-bold text-chalk shadow-[var(--shadow-glow-sm)]"
+        class="bitmap inline-flex items-center gap-2 px-5 py-2.5 font-display text-sm font-bold text-chalk [--bitmap-step:2px] [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:rgb(0_0_0/0.86)]"
       >
         View protocol
         <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]">

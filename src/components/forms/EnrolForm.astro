@@ -5,46 +5,90 @@
  * Posts to /api/enrol. Works without JS (standard form POST); with JS it
  * submits in place and swaps in a confirmation.
  */
+import Button from "../ui/Button.astro";
+
 interface Props {
   class?: string;
 }
 const { class: className = "" } = Astro.props;
 
-const field =
-  "w-full rounded-soft border border-border bg-surface-raised px-4 py-3 text-chalk placeholder:text-content-faint focus:outline-none";
+/* The bitmap material lives on a WRAPPER, not on the control: <input> is a
+   replaced element and never renders ::before, which is where the fill and
+   the dot screen are painted. Wrapping also means the screen can react to
+   focus-within, so the whole field responds rather than just the text box.
+
+   A field carries a faint screen at rest — it reads as printed onto the plate
+   rather than cut out of it — and the dots grow as it takes focus. Focus is
+   signalled on two channels, ink colour and tone, never colour alone. */
+const shell =
+  "bitmap mt-1.5 [--bitmap-fill:var(--color-surface-raised)] [--bitmap-dot:rgb(255_255_255/0.16)] " +
+  "[--dot-r:0.5px] focus-within:[--dot-r:1px] focus-within:[--bitmap-ink:var(--color-brand-soft)]";
+const field = "w-full bg-transparent px-4 py-3 text-chalk placeholder:text-content-faint focus:outline-none";
 const label = "block text-sm font-medium";
 ---
 
 <form method="POST" action="/api/enrol" data-enrol-form class:list={["flex flex-col gap-5", className]}>
   <div>
     <label for="enrol-name" class={label}>Your name</label>
-    <input id="enrol-name" name="name" type="text" required autocomplete="name" class:list={[field, "mt-1.5"]} />
+    <div class={shell}>
+      <input id="enrol-name" name="name" type="text" required autocomplete="name" class={field} />
+    </div>
   </div>
 
   <div>
     <label for="enrol-email" class={label}>Email</label>
-    <input id="enrol-email" name="email" type="email" required autocomplete="email" class:list={[field, "mt-1.5"]} />
+    <div class={shell}>
+      <input id="enrol-email" name="email" type="email" required autocomplete="email" class={field} />
+    </div>
   </div>
 
   <div>
     <label for="enrol-stage" class={label}>Where are you in your studies?</label>
-    <input
-      id="enrol-stage"
-      name="stage"
-      type="text"
-      required
-      placeholder="e.g. 2nd year pharmacy, FY1 doctor"
-      class:list={[field, "mt-1.5"]}
-    />
+    <div class={shell}>
+      <input
+        id="enrol-stage"
+        name="stage"
+        type="text"
+        required
+        placeholder="e.g. 2nd year pharmacy, FY1 doctor"
+        class={field}
+      />
+    </div>
   </div>
 
   <div>
     <label for="enrol-goals" class={label}>What do you want to get out of the program?</label>
-    <textarea id="enrol-goals" name="goals" rows="4" class:list={[field, "mt-1.5 resize-y"]}></textarea>
+    <div class={shell}>
+      <textarea id="enrol-goals" name="goals" rows="4" class:list={[field, "block resize-y"]}></textarea>
+    </div>
   </div>
 
   <label class="flex items-start gap-3 text-sm">
-    <input type="checkbox" name="consent" required class="mt-1" />
+    {/* The OS checkbox is the last rounded, antialiased, blue-when-checked
+        object on the page. Drawn here instead: same pixel corner as every
+        other control, and the tick is a staircase of 2x2 blocks on the same
+        16-unit grid the arrow glyphs use. The real input stays inside the
+        box, transparent and full-size, so it keeps its own semantics, hit
+        target and keyboard behaviour. Focus is lifted via has-[:focus-visible]
+        on the wrapper because clip-path would clip a real outline away. */}
+    <span
+      class="bitmap relative mt-0.5 grid size-[18px] shrink-0 place-items-center [--bitmap-step:1px] [--bitmap-fill:var(--color-surface-raised)] has-[:checked]:[--bitmap-fill:var(--color-violet-500)] has-[:checked]:[--bitmap-ink:var(--color-violet-500)] has-[:focus-visible]:[--bitmap-ink:var(--color-brand-soft)] has-[:focus-visible]:[--bitmap-ink-w:2px]"
+    >
+      <input type="checkbox" name="consent" required class="peer absolute inset-0 cursor-pointer appearance-none" />
+      <svg
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+        fill="currentColor"
+        class="pointer-events-none size-3 text-chalk opacity-0 transition-opacity duration-[var(--duration-ui)] peer-checked:opacity-100"
+      >
+        <rect x="2" y="7" width="2" height="2"></rect>
+        <rect x="4" y="9" width="2" height="2"></rect>
+        <rect x="6" y="11" width="2" height="2"></rect>
+        <rect x="8" y="9" width="2" height="2"></rect>
+        <rect x="10" y="7" width="2" height="2"></rect>
+        <rect x="12" y="5" width="2" height="2"></rect>
+      </svg>
+    </span>
     <span>
       I agree to the <a href="/legal/privacy" class="underline">privacy policy</a> and to being
       contacted about my application.
@@ -54,12 +98,7 @@ const label = "block text-sm font-medium";
   {/* Honeypot. */}
   <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" class="absolute h-0 w-0 overflow-hidden opacity-0" />
 
-  <button
-    type="submit"
-    class="self-start rounded-pill bg-violet-500 px-8 py-4 font-display font-bold text-chalk shadow-[var(--shadow-glow-sm)] transition-colors duration-[var(--duration-ui)] hover:bg-violet-400 disabled:opacity-50"
-  >
-    Submit application
-  </button>
+  <Button type="submit" variant="glow" size="md" class="self-start">Submit application</Button>
 
   <p data-enrol-status role="status" aria-live="polite" class="min-h-5 text-sm text-content-muted"></p>
 </form>

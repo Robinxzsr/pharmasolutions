@@ -147,10 +147,27 @@
     }
   }
 
+  /* Square ring, not a pill: the focus indicator belongs to the same grid
+     the controls are cut on. Controls using the `bitmap` utility opt out of
+     this and draw focus inside their own clip instead — clip-path would
+     otherwise clip the outline away entirely. */
   :focus-visible {
     outline: 2px solid var(--color-brand-soft);
     outline-offset: 3px;
-    border-radius: var(--radius-pill);
+    border-radius: 0;
+  }
+
+  /* Browser surfaces the design still owns. A blinking 1px system caret in a
+     field set in a pixel face is where the illusion breaks first; the wide
+     violet caret is what a bitmap terminal actually had. */
+  input,
+  textarea {
+    caret-color: var(--color-violet-300);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-void-500) transparent;
   }
 
   ::selection {
@@ -246,4 +263,147 @@
   transition:
     opacity var(--duration-reveal) var(--ease-out-soft),
     transform var(--duration-reveal) var(--ease-out-soft);
+}
+
+/* ==========================================================================
+   THE BITMAP MATERIAL
+   ==========================================================================
+
+   The site has two materials and they are not interchangeable.
+
+   `glass` + `rounded-pill` + `--shadow-glow-*` belong to the hero's 3D pill:
+   smooth, emissive, floating. That material stays rare and precious — the
+   hero and the nav capsule that floats over it, and nothing else.
+
+   Everything you actually operate — buttons, cards, fields — belongs to the
+   other half of the hero: the halftone plate. That plate is a photograph
+   quantised onto a hard grid of dots, so the controls are built the same way.
+   Tone is carried by dot SIZE, not by opacity or blur, exactly as it is in a
+   real dot screen: a darker patch is the same dots, printed fatter.
+
+   Applying the pill/glass/glow language to every control was what made the UI
+   read as generic — the precious material stopped being precious. Splitting
+   the two is the whole idea here.
+   ========================================================================== */
+
+/* Registering the dot radius as a real <length> is what lets tone *animate*.
+   An unregistered custom property inside a gradient is a string and snaps
+   between values; registered, the browser interpolates it on the compositor,
+   so a hover genuinely grows the dots instead of cross-fading two screens. */
+@property --dot-r {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@layer base {
+  :root {
+    /* One pixel of the control grid. Corners are two of these, so the step
+       stays legible as a step at 3px but never reads as a chamfer. */
+    --bitmap-step: 3px;
+    /* The dot pitch. 4px against the hero plate's 5px: controls are smaller
+       objects, so they carry a slightly finer screen — same plate, closer
+       viewing distance. */
+    --dot-grid: 4px;
+  }
+}
+
+@utility bitmap {
+  /* A box whose corners resolve on the pixel grid: a curve drawn at low
+     resolution rather than a smooth one. Two 1px-ish steps per corner.
+
+     Built as ink-behind-fill rather than `border` + `border-radius` because
+     a border follows the border box, not the clip — the staircase corners
+     would lose their outline. The element itself paints the ink; ::before
+     paints the fill inset by the ink width, under the same clip path. Both
+     read the clip from a custom property so the percentages resolve against
+     each box's own size.
+
+     Consequence worth knowing: clip-path clips a focus outline away too, so
+     focus here is drawn INSIDE, by thickening and lighting the ink. See
+     :focus-visible below. */
+  --bitmap-fill: var(--color-surface);
+  --bitmap-ink: var(--color-border);
+  --bitmap-ink-w: 1px;
+  --bitmap-dot: transparent;
+  /* --dot-r has to inherit for ::before to read it, which means a bitmap box
+     nested inside a screened one would silently pick up its parent's tone —
+     the footer's subscribe tile inside the screened capture bar was showing a
+     standing halftone nobody asked for. Every box resets to its own baseline
+     and opts back in explicitly. */
+  --dot-r: 0px;
+  --s: var(--bitmap-step);
+  --bitmap-clip: polygon(
+    calc(var(--s) * 2) 0,
+    calc(100% - var(--s) * 2) 0,
+    calc(100% - var(--s) * 2) var(--s),
+    calc(100% - var(--s)) var(--s),
+    calc(100% - var(--s)) calc(var(--s) * 2),
+    100% calc(var(--s) * 2),
+    100% calc(100% - var(--s) * 2),
+    calc(100% - var(--s)) calc(100% - var(--s) * 2),
+    calc(100% - var(--s)) calc(100% - var(--s)),
+    calc(100% - var(--s) * 2) calc(100% - var(--s)),
+    calc(100% - var(--s) * 2) 100%,
+    calc(var(--s) * 2) 100%,
+    calc(var(--s) * 2) calc(100% - var(--s)),
+    var(--s) calc(100% - var(--s)),
+    var(--s) calc(100% - var(--s) * 2),
+    0 calc(100% - var(--s) * 2),
+    0 calc(var(--s) * 2),
+    var(--s) calc(var(--s) * 2),
+    var(--s) var(--s),
+    calc(var(--s) * 2) var(--s)
+  );
+
+  position: relative;
+  /* Creates the stacking context that lets ::before sit above the ink but
+     below the label, without the label needing a z-index of its own. */
+  isolation: isolate;
+  background-color: var(--bitmap-ink);
+  clip-path: var(--bitmap-clip);
+  transition:
+    background-color var(--duration-ui) var(--ease-out-soft),
+    --dot-r var(--duration-ui) var(--ease-out-soft),
+    color var(--duration-ui) var(--ease-out-soft);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: var(--bitmap-ink-w);
+    z-index: -1;
+    clip-path: var(--bitmap-clip);
+    background-color: var(--bitmap-fill);
+    /* The screen itself. The falloff is a MULTIPLE of the radius, not a fixed
+       offset past it. Two reasons: it keeps the dot edge equally hard at every
+       size — a halftone dot has an edge, it does not feather into a blob — and
+       it makes a radius of zero mean genuinely zero. With a fixed "+ 0.35px"
+       the two stops stay apart at r=0, so every 4px cell still painted a
+       sub-pixel speck and controls that should be clean slabs at rest carried
+       a faint standing texture. Here both stops collapse together and nothing
+       is drawn at all. */
+    background-image: radial-gradient(
+      circle at center,
+      var(--bitmap-dot) var(--dot-r),
+      transparent calc(var(--dot-r) * 1.4)
+    );
+    background-size: var(--dot-grid) var(--dot-grid);
+    transition:
+      background-color var(--duration-ui) var(--ease-out-soft),
+      inset var(--duration-ui) var(--ease-out-soft);
+  }
+
+  /* Focus has to live inside the clip: thicker ink, lit to violet, and the
+     screen comes up with it so the change is not carried by colour alone. */
+  &:focus-visible {
+    outline: none;
+    --bitmap-ink: var(--color-brand-soft);
+    --bitmap-ink-w: 2px;
+  }
+}
+
+@utility bitmap-flat {
+  /* Square-cornered member of the same family, for boxes big enough that a
+     6px corner step would read as an accident rather than a decision. */
+  --bitmap-clip: none;
 }

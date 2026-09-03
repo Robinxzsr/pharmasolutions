@@ -41,7 +41,7 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
 
 <a
   href={`/blog/${post.id}`}
-  class="group/card block overflow-hidden rounded-card border border-border bg-surface-raised transition-[border-color,box-shadow] duration-300 ease-out hover:border-violet-500/40 hover:shadow-[var(--shadow-glow-sm)] focus-visible:border-violet-500/40 focus-visible:shadow-[var(--shadow-glow-sm)]"
+  class="group/card bitmap block p-0.5 [--bitmap-step:4px] [--bitmap-ink-w:2px] [--bitmap-fill:var(--color-surface-raised)] transition-colors duration-300 ease-out hover:[--bitmap-ink:var(--color-violet-500)] focus-visible:[--bitmap-ink:var(--color-brand-soft)]"
 >
   <div class="relative overflow-hidden">
     {
@@ -73,7 +73,7 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
       tags.length > 0 && (
         <div class="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
           {tags.slice(0, 2).map((tag) => (
-            <span class="rounded-pill border border-border bg-surface/80 px-2.5 py-1 text-[11px] font-display font-bold text-content-muted">
+            <span class="bitmap px-2.5 py-1 text-[11px] font-display font-bold text-content-muted [--bitmap-step:2px] [--bitmap-fill:rgb(0_0_0/0.8)]">
               {tag}
             </span>
           ))}
@@ -85,17 +85,14 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
       class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100"
     >
       <span
-        class="inline-flex items-center gap-2 rounded-pill border border-border bg-surface/90 px-5 py-2.5 font-display text-sm font-bold text-chalk shadow-[var(--shadow-glow-sm)]"
+        class="bitmap inline-flex items-center gap-2 px-5 py-2.5 font-display text-sm font-bold text-chalk [--bitmap-step:2px] [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:rgb(0_0_0/0.86)]"
       >
         Read article
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4">
-          <path
-            d="M5 12h14M13 6l6 6-6 6"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></path>
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]">
+          <rect x="1" y="6" width="8" height="4" fill="currentColor"></rect>
+          <rect x="9" y="2" width="2" height="12" fill="currentColor"></rect>
+          <rect x="11" y="4" width="2" height="8" fill="currentColor"></rect>
+          <rect x="13" y="6" width="2" height="4" fill="currentColor"></rect>
         </svg>
       </span>
     </div>
@@ -109,15 +106,11 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
       <div class="flex min-w-0 items-center gap-2">
         {
           author?.data.portrait ? (
-            <Image
-              src={author.data.portrait}
-              alt=""
-              width={28}
-              height={28}
-              class="size-7 shrink-0 rounded-full border border-border object-cover"
-            />
+            <span class="bitmap size-7 shrink-0 p-px [--bitmap-step:2px]">
+              <Image src={author.data.portrait} alt="" width={28} height={28} class="size-full object-cover" />
+            </span>
           ) : (
-            <span class="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-void-800 font-display text-xs font-bold text-content-muted">
+            <span class="bitmap flex size-7 shrink-0 items-center justify-center font-display text-xs font-bold text-content-muted [--bitmap-step:2px] [--bitmap-fill:var(--color-void-800)]">
               {author?.data.name?.[0] ?? "?"}
             </span>
           )
@@ -129,9 +122,15 @@ const formattedDate = publishedAt.toLocaleDateString("en-GB", {
       </div>
 
       <div class="flex shrink-0 items-center gap-1 text-[11px] text-content-faint">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-3.5">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-          <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 shrink-0 translate-y-[0.06em]" fill="currentColor">
+          <rect x="6" y="2" width="4" height="1"></rect>
+          <rect x="4" y="3" width="2" height="1"></rect><rect x="10" y="3" width="2" height="1"></rect>
+          <rect x="3" y="4" width="1" height="1"></rect><rect x="12" y="4" width="1" height="1"></rect>
+          <rect x="2" y="5" width="1" height="6"></rect><rect x="13" y="5" width="1" height="6"></rect>
+          <rect x="3" y="11" width="1" height="1"></rect><rect x="12" y="11" width="1" height="1"></rect>
+          <rect x="4" y="12" width="2" height="1"></rect><rect x="10" y="12" width="2" height="1"></rect>
+          <rect x="6" y="13" width="4" height="1"></rect>
+          <rect x="7" y="5" width="1" height="4"></rect><rect x="7" y="8" width="3" height="1"></rect>
         </svg>
         {readMinutes} min
       </div>

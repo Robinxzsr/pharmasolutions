@@ -27,10 +27,15 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
           plans.map((plan) => (
             <article
               class:list={[
-                "flex flex-col rounded-card border p-8",
+                "bitmap flex flex-col p-8 [--bitmap-step:4px] [--bitmap-ink-w:2px] [--bitmap-fill:var(--color-surface-raised)]",
+                /* The recommended plan was marked by a border colour AND a
+                   glow — two elevation systems stacked on one card. It is
+                   marked here the way the plate marks anything: violet ink,
+                   and a standing halftone screen the other cards do not
+                   carry. Tone, not a halo. */
                 plan.data.highlighted
-                  ? "border-violet-500/50 bg-surface-raised shadow-[var(--shadow-glow-sm)]"
-                  : "border-border bg-surface-raised",
+                  ? "[--bitmap-ink:var(--color-violet-500)] [--bitmap-dot:var(--color-violet-500)] [--dot-r:0.6px]"
+                  : "",
               ]}
             >
               <h2 class="text-[length:var(--text-display-sm)]">{plan.data.name}</h2>
@@ -49,11 +54,11 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
                 type="button"
                 data-checkout={plan.data.stripePriceId}
                 class:list={[
-                  "mt-8 rounded-pill px-6 py-3 font-display font-bold transition-[background-color,opacity]",
-                  "duration-[var(--duration-ui)] disabled:opacity-50",
+                  "bitmap mt-8 px-6 py-3 font-display font-bold disabled:opacity-50",
+                  "hover:[--dot-r:0.95px] focus-visible:[--dot-r:0.95px]",
                   plan.data.highlighted
-                    ? "bg-violet-500 text-chalk hover:bg-violet-400"
-                    : "bg-chalk text-void-950 hover:opacity-[0.88]",
+                    ? "text-chalk [--bitmap-ink:var(--color-violet-500)] [--bitmap-fill:var(--color-violet-500)] [--bitmap-dot:var(--color-void-950)] hover:[--bitmap-ink:var(--color-violet-300)]"
+                    : "text-void-950 [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] [--bitmap-dot:var(--color-void-950)]",
                 ]}
               >
                 Choose {plan.data.name}
