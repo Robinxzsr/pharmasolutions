@@ -24,6 +24,16 @@
  * sitting slightly high next to the letters. The nudge is in `em`, not `px`,
  * so it scales with the same clamp() the link's font-size uses.
  *
+ * Deliberately no `shape-rendering="crispEdges"` on that svg, even though the
+ * shape is built from a 16-unit pixel grid. The icon renders at a fractional
+ * scale of that grid at almost every clamp() breakpoint (e.g. an 18px box is
+ * 1.125x), and crispEdges pixel-snaps each <rect> independently — verified
+ * (via canvas getImageData, comparing mirrored rows) that this snapping
+ * rounds top and bottom edges inconsistently and produces a genuinely
+ * lopsided glyph at several real breakpoints (18px, 20px, 22px), while
+ * ordinary anti-aliased rendering stayed pixel-symmetric at every size
+ * tested. A faint AA edge beats a visibly crooked arrow.
+ *
  * Nav links are set in NeueBit rather than bold Mondwest: Mondwest has no
  * true bold weight, so asking for it synthesises (faux-bolds) the face,
  * which smears a pixel typeface. NeueBit is the only face here with a real
@@ -102,7 +112,6 @@ const isActive = (href: string) =>
               >
                 <svg
                   viewBox="0 0 16 16"
-                  shape-rendering="crispEdges"
                   aria-hidden="true"
                   class:list={[
                     "size-[0.8em] shrink-0 translate-y-[0.06em] transition-[transform,opacity] duration-300 ease-out",

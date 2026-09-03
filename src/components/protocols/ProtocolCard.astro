@@ -16,7 +16,11 @@
  * as one system rather than two different affordances that happen to look
  * similar. It's built from axis-aligned rects rather than a stroked path so
  * its edges stay as hard as the pixel display face's, instead of the smooth
- * rounded joins a generic icon stroke would carry.
+ * rounded joins a generic icon stroke would carry. No `shape-rendering:
+ * crispEdges` (see Header.astro for the measured reason) — it pixel-snaps
+ * each rect independently and renders a visibly lopsided glyph at several
+ * real sizes, since the icon is almost never shown at an exact multiple of
+ * its 16-unit grid.
  */
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
@@ -57,7 +61,6 @@ const { name, summary, priceDisplay, cover, coverAlt } = protocol.data;
 
     <svg
       viewBox="0 0 16 16"
-      shape-rendering="crispEdges"
       aria-hidden="true"
       class="mt-1 size-3.5 shrink-0 -translate-x-2 text-content-faint opacity-0 transition-[transform,opacity,color] duration-300 ease-out group-hover/card:translate-x-0 group-hover/card:text-brand-soft group-hover/card:opacity-100 group-focus-visible/card:translate-x-0 group-focus-visible/card:text-brand-soft group-focus-visible/card:opacity-100"
     >
