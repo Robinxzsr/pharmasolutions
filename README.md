@@ -36,31 +36,105 @@ if the deploy target changes.
 
 ### The design system
 
-The visual language is *dark clinical*: black ground, violet emissive accent, ember
-counter-light, pixel display faces, fully-rounded controls. The palette is sampled
-from the hero's own three-point lighting rig so the 2D UI and the 3D scene sit in
-the same light.
+The visual language is a **printed object**: black ground, hard square boxes, flat
+inks, pixel display faces. Nothing glows and nothing is rounded.
 
-- **`src/styles/global.css`** — all design tokens in one `@theme` block. Raw ramps
-  (`void`, `violet`, `ember`, `chalk`) plus semantic aliases (`surface`, `content`,
-  `brand`, `accent`, `border`) that components actually reference. Re-theming means
-  editing the alias block only. Never hardcode a hex in a component.
-- **`src/components/ui/Section.astro`** — a page band: ground tone, vertical rhythm,
-  and an optional violet wash that echoes the hero's bloom.
-- **`glass`** utility — the frosted capsule used by the nav and any floating control.
+**Exactly three colours: black, white, and one blue (`#202CDE`).** There is no
+fourth. The rule that keeps it to three is:
 
-**Typography.** `PP NeueBit` (display) and `PP Mondwest` (UI/body) are the brand
-faces. NeueBit is the only true bold available — asking for bold Mondwest would
-synthesise it, which smears a pixel typeface, so every bold thing uses NeueBit.
-Long-form article copy uses **Inter** via the `prose-body` utility: the pixel faces
-are display types and are punishing at paragraph length. Inter is only fetched on
-pages that actually render prose.
+> **Blue is a fill. White is the lit state.**
 
-> **Font licensing.** PP NeueBit and PP Mondwest are commercial Pangram Pangram
-> faces. The `.woff2` files are committed in `src/assets/fonts/` and are served
-> publicly at build time — this needs a paid web licence from Pangram Pangram before
-> the site goes live. Swap `--font-display` / `--font-body` in `global.css` if you'd
-> rather not licence them.
+Blue is never text on a dark ground — it is the thing text sits *on*. Anything that
+wants to say "active", "focused" or "hovered" goes **white**, not pale blue. Text on
+blue is white; text on white is black. (A pale blue tint used to exist to carry
+accent text, because `#202CDE` is too dark to read on black — that tint was a fourth
+colour in all but name, so the rule above replaced it.)
+
+- **`src/styles/global.css`** — every token in one `@theme` block. Raw values
+  (`void`, `blue`, `chalk`) plus semantic aliases (`surface`, `content`, `brand`,
+  `border`, `border-lit`) that components reference. Re-theming means editing the
+  alias block only. Never hardcode a hex in a component.
+- **`flood`** utility — the card hover: the whole panel fills with brand ink and the
+  cover art duotones blue beneath its halftone screen. A press can run a second
+  solid plate; it cannot make a card glow.
+- **`label`** utility — the one micro-label treatment (11px, uppercase, tracked) for
+  tags, prices, statuses and metadata. Used everywhere, defined once.
+
+---
+
+## Changing the fonts
+
+Fonts are wired in **two places**, and you almost always only need the second one.
+
+**1. `astro.config.mjs` — which font FILES exist.** Each entry in the `fonts` array
+registers a family and gives it a CSS variable name:
+
+```js
+{
+  provider: fontProviders.local(),
+  name: "PP Mondwest",
+  cssVariable: "--font-mondwest",        // <- the handle you use later
+  options: {
+    variants: [
+      { weight: 400, style: "normal", src: ["./src/assets/fonts/ppmondwest-regular.woff2"] },
+      { weight: 700, style: "normal", src: ["./src/assets/fonts/ppmondwest-bold.woff2"] },
+    ],
+  },
+  fallbacks: ["ui-monospace", "monospace"],
+}
+```
+
+To add a new face: drop the `.woff2` in `src/assets/fonts/`, copy that block, change
+`name`, `cssVariable` and `src`. For a Google font use `fontProviders.google()` and
+list `weights` / `subsets` instead of `variants`. Then add one line to
+`src/layouts/BaseLayout.astro` so the `@font-face` is emitted:
+
+```astro
+<Font cssVariable="--font-yourfamily" />   {/* add `preload` only for above-the-fold faces */}
+```
+
+**2. `src/styles/global.css` — which font is used WHERE.** This is the part to play
+with. Three roles, three variables, near the top of the `@theme` block:
+
+```css
+--font-display: var(--font-neuebit);    /* headings h1–h4, buttons, card titles  */
+--font-body:    var(--font-mondwest);   /* the site default: UI, labels, forms    */
+--font-prose:   var(--font-editorial);  /* long-form reading + card descriptions  */
+```
+
+Point any of those at any registered family and the whole site follows. Swapping
+`--font-prose` to `var(--font-mondwest)` puts articles in the pixel face; swapping
+`--font-display` changes every heading and button at once. **You never need to touch
+a component to change a font** — that's the whole point of the three roles.
+
+Which role covers what:
+
+| Role | Applied by | Covers |
+|---|---|---|
+| `--font-display` | the `h1,h2,h3,h4` base rule + `font-display` class | page titles, card titles, all button labels |
+| `--font-body` | `font-family` on `html` + `font-body` class | everything not otherwise specified: nav, forms, labels, metadata |
+| `--font-prose` | the `prose-body` utility + `font-prose` class | article body, page ledes, card descriptions |
+
+To change **one section only**, put a `font-display` / `font-body` / `font-prose`
+class on that element instead of editing the token — e.g. card descriptions carry
+`font-prose` explicitly, which is why they read in the serif while the card title
+next to them stays pixel.
+
+Two gotchas:
+
+- **Weights only exist if a file is registered for them.** `font-bold` on a family
+  with no 700 file makes the browser fake it, which visibly smears a pixel face.
+  Mondwest and Editorial New both have real 700s registered; check the config before
+  reaching for a weight.
+- **`prose-body` sets a font on a whole container**, so anything nested inside it
+  inherits the serif. Forms rendered through `PageLayout` therefore declare
+  `font-body` on their own root to opt back out.
+
+> **Font licensing.** PP NeueBit, PP Mondwest and PP Editorial New are all
+> commercial Pangram Pangram faces. The `.woff2` files are committed in
+> `src/assets/fonts/` and served publicly at build time — this needs a paid web
+> licence from Pangram Pangram before the site goes live. Swapping the three
+> `--font-*` roles in `global.css` is the escape hatch.
 
 ### The hero
 

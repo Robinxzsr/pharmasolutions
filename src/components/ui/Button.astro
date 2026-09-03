@@ -14,10 +14,9 @@
  *   glow     blue slab       ->  white fill, blue label
  *   ghost    outline only    ->  white fill, black label
  *
- * All three also take the bloom (`--shadow-glow-sm`), so the light behind a
- * pressed-looking control is the same light the hero pill throws. Timing is
- * --duration-ui, fast enough to read as a response rather than an animation;
- * sustained motion on this site belongs to cards (`shine`) alone.
+ * Nothing blurs or glows. A control changes which flat colour it is, at
+ * --duration-ui, and that is the whole vocabulary — see the note on the box
+ * material in global.css.
  *
  * Labels are uppercase and widely tracked — the CTA treatment from the
  * reference material, and the same voice as the `label` utility so a button
@@ -49,19 +48,18 @@ const base =
   "lift inline-flex items-center justify-center gap-[11px] leading-none border " +
   "font-display font-bold uppercase tracking-[0.1em] disabled:pointer-events-none disabled:opacity-50";
 
-/* `glow` is the one variant lit at rest as well as on hover — the standing
-   bloom is what marks it as the single primary action on a page (enrol,
-   checkout). Its hover therefore has to be a genuine inversion rather than
-   "more glow", or there'd be nowhere left for it to go. */
+/* `glow` keeps its name for API stability, but it is now simply the solid
+   blue variant: the one filled with brand ink at rest, marking the single
+   primary action on a page (enrol, checkout). */
 const variantClass = {
   primary:
     "border-chalk bg-chalk text-void-950 " +
-    "hover:border-blue-500 hover:bg-blue-500 hover:text-chalk " +
-    "focus-visible:border-blue-500 focus-visible:bg-blue-500 focus-visible:text-chalk",
+    "hover:border-brand hover:bg-brand hover:text-chalk " +
+    "focus-visible:border-brand focus-visible:bg-brand focus-visible:text-chalk",
   glow:
-    "border-blue-500 bg-blue-500 text-chalk shadow-[var(--shadow-glow-sm)] " +
-    "hover:border-chalk hover:bg-chalk hover:text-blue-600 hover:shadow-[var(--shadow-glow-lg)] " +
-    "focus-visible:border-chalk focus-visible:bg-chalk focus-visible:text-blue-600 focus-visible:shadow-[var(--shadow-glow-lg)]",
+    "border-brand bg-brand text-chalk " +
+    "hover:border-chalk hover:bg-chalk hover:text-brand " +
+    "focus-visible:border-chalk focus-visible:bg-chalk focus-visible:text-brand",
   ghost:
     "border-chalk/35 bg-transparent text-chalk " +
     "hover:border-chalk hover:bg-chalk hover:text-void-950 " +

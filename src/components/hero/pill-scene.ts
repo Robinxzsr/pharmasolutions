@@ -213,7 +213,14 @@ export function initPillScene({
      counterweight to the violet. The palette is black/white/blue only now,
      so the counterweight is temperature rather than hue: a much paler,
      cooler blue than the key, which still separates the two lit sides
-     without introducing a second colour into a three-colour scheme. */
+     without introducing a second colour into a three-colour scheme.
+
+     These hexes are LIGHT SOURCES, not palette entries, which is why they
+     are brighter than the brand blue and why they are not tokens. A lamp
+     pointed at an object is not the same value as the ink you would print
+     that object in — the UI palette is three flat colours precisely because
+     it has no lighting model, and this scene does. Do not "fix" these to
+     #202CDE; it would render the pill an unlit navy lump. */
   const ambient = new THREE.AmbientLight(0xffffff, 0.2);
   const keyLight = new THREE.DirectionalLight(0x4457ff, GLOW.keyLight);
   keyLight.position.set(-3, 2, 3);
@@ -232,11 +239,11 @@ export function initPillScene({
     metalness: 0.0,
     roughness: GLOW.roughness,
     ior: 1.45,
-    /* The emissive is blue-400, not the brand blue-500: emission drives the
-       bloom, and #202CDE sits well below the bloom threshold — swapping the
-       hue at equal-ish luminance to the old violet (0.158 vs 0.167 relative)
-       keeps the pass tuned exactly where it was. See the bloom notes in
-       CLAUDE.md before moving it. */
+    /* Brighter than the brand blue on purpose: emission drives the bloom, and
+       #202CDE sits well below the bloom threshold. Matched to the old
+       violet's relative luminance (0.154 vs 0.167) when the hue changed, so
+       the narrowly-tuned bloom pass still lands where it was. See the bloom
+       notes in CLAUDE.md before moving it. */
     emissive: 0x4457ff,
     emissiveIntensity: GLOW.emissive,
     clearcoat: GLOW.clearcoat,

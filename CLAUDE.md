@@ -47,17 +47,37 @@ browser just renders an empty list (see Traps).
 (`void`, `blue`, `chalk`). Re-theming should mean editing the alias block only.
 
 **The palette is exactly three colours: black, white, and one blue** —
-`#202CDE`, the `blue-500` step. It used to run violet plus a warm ember
-counter-light; two competing accents is what made the site read as assembled
-rather than designed, so ember is retired and there is no fourth hue to reach
-for. The blue ramp exists only because one value cannot do every job: `300`
-is the sole step that clears 4.5:1 on black, so **all accent text is
-blue-300**; `500` is for fills and borders; `400` is the lit/hover step, the
-bloom colour, and the hero pill's emissive. The tints are pulled toward cyan
-rather than straight up the brand hue — a naive tint of `#202CDE` reads
-lavender, which is the exact colour this palette was moved off. The dark ramp
-carries a faint blue cast on purpose, so the ground is the same family as the
-accent rather than a neutral that happens to have a colour sitting on it.
+`#202CDE`, exposed as `--color-blue` and aliased to `brand`. There is no blue
+ramp. There is no `blue-300`. Do not add one.
+
+The rule that keeps it at three:
+
+> **Blue is a fill. White is the lit state.**
+
+Blue is never text on a dark ground — it is the thing text sits on. Anything
+saying "active", "hovered" or "focused" goes **white**: nav links, focus
+rings, the caret, lit borders (`--color-border-lit` is chalk). Text on blue
+is white; text on white is black.
+
+This replaced a pale `#8fa3ff` tint that existed to carry accent text,
+because `#202CDE` on black is 2.5:1 and fails. That tint was a fourth colour
+in all but name and it appeared in exactly the places a reader looks first
+(nav, prices). If you hit the same contrast wall, the answer is white or a
+blue *fill behind* white — never a new tint.
+
+The dark ramp carries a faint blue cast on purpose, so the ground is the same
+family as the accent rather than a neutral with a colour sitting on it.
+
+**There are no glow tokens.** `--shadow-glow-sm` / `-lg` are deleted. A
+blurred coloured bloom is the single most "modern SaaS" gesture in a UI and
+this site is a print object. The only thing allowed to glow is the 3D pill in
+the hero, because that is a rendered light source rather than a drawn effect.
+Depth and state come from flat colour and rules.
+
+**The hex values in `pill-scene.ts` are light sources, not palette entries.**
+They are brighter than `#202CDE` and they are deliberately not tokens: a lamp
+pointed at an object is not the ink you would print it in. Do not "fix" them
+to the brand blue — it renders the pill an unlit navy lump.
 
 **Three faces, three jobs.** `font-display` (PP NeueBit, pixel) for headlines
 and control labels. `font-body` (PP Mondwest, pixel) for UI copy, meta and
@@ -80,15 +100,25 @@ the container exists for and wrong for controls — a field label is UI, not
 reading matter. `EnrolForm` and `NewsletterForm` set `font-body` on their
 roots for exactly this reason; anything similar must too.
 
+**Fonts are documented for humans in `README.md`** ("Changing the fonts") —
+which file registers a family, which token points a role at it, and why
+`prose-body` leaks into forms. Point people there rather than re-explaining.
+
 **Small uppercase text is the `label` utility, not a one-off.** Section
 markers, card tags, statuses, meta — one 11px tracked uppercase treatment,
 defined once in `global.css`. Four slightly different versions of it is what
 "disjointed" looked like.
 
-**The blue glow shadows are the theme, not decoration.** `--shadow-glow-sm`
-/ `-lg` deliberately echo the hero pill's own emissive bloom. A generic
-"shadows need an offset" lint would flag them; that's a false positive here.
-Keep using the existing tokens rather than inventing new shadow values.
+**Hover changes what a thing IS, not how lit it is.** One rule, site-wide.
+Buttons invert to a different flat colour (`primary` → blue, `glow` → white,
+`ghost` → white). Cards use the `flood` utility: the whole panel fills with
+brand ink and the cover art duotones blue under its halftone screen. Fields
+take a solid white border. Nothing blurs, nothing travels, nothing pulses.
+
+An animated gradient streak used to run around card borders. It was well
+built and it was wrong — it read as modern precisely because it did something
+a printed object cannot do. If a hover needs more presence, give it more ink,
+not more light.
 
 **Repeatable content goes in `src/content/`**, never inline in a page. Typed
 collections in `src/content.config.ts`. Swapping to a CMS later should mean

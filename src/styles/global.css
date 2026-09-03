@@ -28,21 +28,24 @@
   --color-void-600: #1e2238;
   --color-void-500: #2e3350;
 
-  /* Blue — the one accent. 500 is the brand hex; the ramp exists because a
-     single value cannot do every job:
-       300  the only step that clears 4.5:1 on black, so all accent TEXT.
-            Pulled toward cyan rather than straight up the brand hue: a
-            naive tint of #202CDE reads lavender, which is the exact colour
-            this palette was moved off.
-       400  the lifted/hover step, and the hero pill's emissive sibling —
-            an emitting surface reads brighter than the flat swatch
-       500  #202CDE, the brand colour, for fills and borders
-       600  pressed/deep fills */
-  --color-blue-200: #dbe1ff;
-  --color-blue-300: #8fa3ff;
-  --color-blue-400: #4457ff;
-  --color-blue-500: #202cde;
-  --color-blue-600: #141c96;
+  /* Blue — ONE value, no ramp. There is no blue-300 or blue-400 to reach
+     for, and that is the point.
+
+     A tint ramp existed because #202CDE is too dark to use as TEXT on black
+     (2.5:1, a clear fail), so a pale step got invented to carry accent text
+     — nav links, prices, focus rings. That pale step is a fourth colour: it
+     is not black, not white, and not the brand blue, and it showed up in
+     exactly the places a reader looks first.
+
+     The fix is not a better tint, it's a different rule:
+
+         BLUE IS A FILL. WHITE IS THE LIT STATE.
+
+     Blue is never text on a dark ground — it is the thing text sits ON.
+     Anything that used to go pale-blue to say "active" goes white instead,
+     which is both the higher contrast answer and the one the reference
+     material uses. Text on blue is white; text on white is black. */
+  --color-blue: #202cde;
 
   /* Text — pure white down through the alpha steps the hero uses */
   --color-chalk: #ffffff;
@@ -63,13 +66,11 @@
   --color-content: var(--color-chalk);
   --color-content-muted: var(--color-chalk-muted);
   --color-content-faint: var(--color-chalk-faint);
-  --color-brand: var(--color-blue-500);
-  --color-brand-soft: var(--color-blue-300);
+  --color-brand: var(--color-blue);
   --color-border: var(--color-edge);
-  /* The border a surface gets when it is active, focused, or hovered. Named
-     rather than reached for ad hoc, because "which blue does a lit border
-     use" was being answered differently in five components. */
-  --color-border-lit: var(--color-blue-400);
+  /* The border a surface gets when it is active, focused or hovered. White,
+     not blue: see the palette note above — blue fills, white lights up. */
+  --color-border-lit: var(--color-chalk);
 
   /* --- Typography ----------------------------------------------------------
      Three faces, three jobs, no overlap:
@@ -116,14 +117,20 @@
   --duration-reveal: 700ms;
   --duration-ui: 200ms;
 
-  /* --- Glow ----------------------------------------------------------------
-     The 2D echo of the hero's bloom pass, so buttons and panels sit in the
-     same light as the 3D scene. Keyed to blue-400, not the brand 500: a
-     bloom is light leaving a surface, and #202CDE is too dark to read as
-     light once it is blurred out over black.
+  /* --- No glow -------------------------------------------------------------
+     There used to be `--shadow-glow-sm` / `-lg` here: a blurred bloom behind
+     every hovered control, echoing the hero pill.
+
+     They are gone, and nothing replaces them. A soft coloured blur is the
+     single most "modern SaaS" gesture in a UI, and this site is a print
+     object — hard edges, flat inks, no light leaking out of a rectangle. The
+     one thing on the site allowed to glow is the actual 3D pill in the hero,
+     because that is a rendered light source rather than a drawn effect.
+
+     Depth and state are carried by flat colour and rules instead: a control
+     changes what it IS (blue fill, white fill, white border), not how much
+     it is lit.
   */
-  --shadow-glow-sm: 0 0 24px -6px rgb(68 87 255 / 0.55);
-  --shadow-glow-lg: 0 0 80px -12px rgb(68 87 255 / 0.6);
 }
 
 /* ==========================================================================
@@ -172,20 +179,22 @@
     }
   }
 
-  /* Square, not a pill — every control on the site is a plain rectangle,
-     so the focus ring is one too. */
+  /* Square, not a pill — every control on the site is a plain rectangle, so
+     the focus ring is one too. White rather than blue, for the reason in the
+     palette note: blue is a fill, white is the lit state. It is also simply
+     the higher-contrast ring on a near-black page. */
   :focus-visible {
-    outline: 2px solid var(--color-brand-soft);
+    outline: 2px solid var(--color-chalk);
     outline-offset: 3px;
     border-radius: 0;
   }
 
   /* Browser surfaces the design still owns. A blinking 1px system caret in a
-     field set in a pixel face is where the illusion breaks first; the wide
-     blue caret is what a bitmap terminal actually had. */
+     field set in a pixel face is where the illusion breaks first; a solid
+     white block is what a bitmap terminal actually had. */
   input,
   textarea {
-    caret-color: var(--color-blue-300);
+    caret-color: var(--color-chalk);
   }
 
   * {
@@ -194,7 +203,7 @@
   }
 
   ::selection {
-    background: var(--color-blue-500);
+    background: var(--color-brand);
     color: var(--color-chalk);
   }
 }
@@ -304,110 +313,62 @@
    ==========================================================================
 
    Every operable control is a plain rectangle: a border, a flat fill, square
-   corners (the pixel-cut stairstep this used to be is retired — a jagged
-   corner reads as an artifact once you sit with it, not a material). No
-   radius, no clip-path, so a real browser focus outline works everywhere
-   again instead of needing a drawn-in-place substitute.
+   corners. No radius, no clip-path, so a real browser focus outline works
+   everywhere.
 
-   ONE interaction grammar, three tiers, so a hover means the same kind of
-   thing everywhere on the site:
+   ONE interaction rule, and it is a flat one:
 
-   - `shine`  — cards. A bright streak travels the border while hovered.
-   - `lift`   — buttons, fields, tiles. The frame lights and a bloom rises
-                behind it; the fill flip lives on the component.
-   - links    — colour steps to brand-soft. Handled per component.
+       HOVER CHANGES WHAT A THING IS, NOT HOW LIT IT IS.
 
-   The rule is: motion belongs to the thing you're being invited to open;
-   everything else changes state without moving.
+   A control swaps to a different flat colour — blue fill, white fill, white
+   border. Nothing blurs, nothing glows, nothing travels. The animated
+   gradient streak that used to run around card borders is gone: it was a
+   well-executed version of an effect that belongs to a different kind of
+   site, and it read as modern precisely because it was doing something a
+   printed object cannot do.
+
+   What replaces it on cards is the oldest trick there is — the whole panel
+   floods with ink. See `flood` below.
    ========================================================================== */
 
 @utility lift {
-  /* The shared "this is live" response for anything operable. Deliberately
-     fast (--duration-ui) so a control feels answered rather than animated;
-     `shine` is the only place on the site that gets sustained motion. */
+  /* The shared "this is live" response for anything operable: one timing, one
+     set of properties, so every control answers at the same speed. The
+     colour change itself is declared per component, because what a control
+     turns INTO is a design decision each one makes; what it must not do is
+     take its own sweet time about it. */
   transition:
     border-color var(--duration-ui) var(--ease-out-soft),
     background-color var(--duration-ui) var(--ease-out-soft),
-    box-shadow var(--duration-ui) var(--ease-out-soft),
     color var(--duration-ui) var(--ease-out-soft),
     opacity var(--duration-ui) var(--ease-out-soft);
+}
+
+@utility flood {
+  /* The card hover: the entire panel fills with brand ink and every piece of
+     text on it goes white, in one step.
+
+     This is a printing gesture rather than a lighting one. A two-colour press
+     cannot make a panel glow, but it can absolutely run the same plate in
+     solid ink — so the hovered state is not "the card, lit", it is "the card,
+     printed". That is why it sits right next to the halftone plate and the
+     pixel type instead of arguing with them.
+
+     Children opt in by colour-inheriting or by their own `group-hover`
+     classes; the rules inside the card are set in white alphas that hold up
+     on both the near-black rest state and the blue hover state, so they do
+     not need to be re-specified per state. */
+  transition:
+    background-color var(--duration-ui) var(--ease-out-soft),
+    border-color var(--duration-ui) var(--ease-out-soft),
+    color var(--duration-ui) var(--ease-out-soft);
 
   &:hover,
-  &:focus-visible {
-    box-shadow: var(--shadow-glow-sm);
-  }
-}
-
-@keyframes shine-pan {
-  0% {
-    background-position: 12% 12%;
-  }
-  100% {
-    background-position: 78% 78%;
-  }
-}
-
-@utility shine {
-  /* A gradient RING that pans, not a rotating arc.
-     ---------------------------------------------------------------------
-     The ring itself is the standard double-background/mask-composite trick:
-     paint a gradient over the whole box, then punch the content-box out of
-     it with `mask-composite: exclude`, leaving only the 1.5px padding as a
-     frame for the gradient to show through. A box-shadow cannot do this —
-     it can't be masked down to a hairline that still turns the corners.
-
-     What travels is `background-position` across a 300%-sized gradient,
-     which buys two things a rotating conic can't:
-
-       1. THREE bands, not one. The gradient carries three bright stops with
-          transparent gaps between them, so several highlights chase each
-          other round the frame instead of one lonely dot orbiting it.
-       2. The animation runs ALWAYS and is `paused` at rest, resuming on
-          hover. A rotation that starts from 0deg on every hover always
-          enters from the same corner, which is what makes that kind of
-          effect read as canned; resuming mid-cycle means the streak picks
-          up wherever it left off and no two hovers look alike.
-
-     Each band runs white → blue → deep-blue so the highlight has an actual
-     edge to it rather than being a soft white smear. */
-  position: relative;
-  isolation: isolate;
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    padding: 1.5px;
-    background: linear-gradient(
-      145deg,
-      transparent 0%,
-      var(--color-chalk) 14%,
-      var(--color-blue-400) 19%,
-      var(--color-blue-600) 24%,
-      transparent 33% 42%,
-      var(--color-chalk) 54%,
-      var(--color-blue-400) 59%,
-      var(--color-blue-600) 64%,
-      transparent 73% 82%,
-      var(--color-chalk) 94%,
-      var(--color-blue-400) 100%
-    );
-    background-size: 300% 300%;
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    pointer-events: none;
-    animation: shine-pan 2.4s linear infinite paused;
-    transition: opacity var(--duration-ui) var(--ease-out-soft);
-  }
-
-  &:hover::after,
-  &:focus-visible::after {
-    opacity: 1;
-    animation-play-state: running;
+  &:focus-visible,
+  &:focus-within {
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-chalk);
   }
 }
 

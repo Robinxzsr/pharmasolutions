@@ -5,8 +5,8 @@
  * A plain bordered box, not the hero pill's glass — the footer is a solid
  * region of the page, and a frosted capsule there was borrowing a material
  * that only means something where it floats over the 3D pill. On focus the
- * border lifts to the lit blue and the standard bloom appears around the
- * bar, the same feedback every field and button on the site now gives.
+ * border goes to solid white — the same flat focus signal every field on
+ * the site gives.
  *
  * Posts to /api/newsletter with fetch, falling back to a normal form POST if
  * JS is unavailable. Status is announced via aria-live.
@@ -24,7 +24,7 @@ const { class: className = "" } = Astro.props;
   class:list={["w-full font-body", className]}
 >
   <div
-    class="flex items-center gap-2 border border-border bg-void-900 p-1.5 pl-5 transition-[border-color,box-shadow] duration-[var(--duration-ui)] ease-[var(--ease-out-soft)] focus-within:border-border-lit focus-within:shadow-[var(--shadow-glow-sm)]"
+    class="flex items-center gap-2 border border-border bg-void-900 p-1.5 pl-5 transition-[border-color,box-shadow] duration-[var(--duration-ui)] ease-[var(--ease-out-soft)] focus-within:border-border-lit"
   >
     <label for="newsletter-email" class="sr-only">Email address</label>
     <input
@@ -53,7 +53,7 @@ const { class: className = "" } = Astro.props;
         Inverts to blue on hover, the same move Button's primary makes. */}
     <button
       type="submit"
-      class="lift grid size-11 shrink-0 place-items-center border border-chalk bg-chalk text-void-950 hover:border-blue-500 hover:bg-blue-500 hover:text-chalk focus-visible:border-blue-500 focus-visible:bg-blue-500 focus-visible:text-chalk"
+      class="lift grid size-11 shrink-0 place-items-center border border-chalk bg-chalk text-void-950 hover:border-brand hover:bg-brand hover:text-chalk focus-visible:border-brand focus-visible:bg-brand focus-visible:text-chalk"
     >
       <span class="sr-only">Subscribe</span>
       <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
