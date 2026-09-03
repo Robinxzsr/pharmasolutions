@@ -1,84 +1,118 @@
 ---
 /**
- * Footer — four nav columns over the void, with the newsletter capture
- * sitting on the flat page ground.
+ * Footer — the back cover.
+ *
+ * This used to be a conventional four-column sitemap: nav groups, socials,
+ * legal row. That is a *directory*, and a directory at the bottom of a page
+ * is a thing you install because footers are supposed to have one, not
+ * because anybody scrolls down hunting for it. The header rail is this
+ * site's actual navigation.
+ *
+ * So the footer is a colophon now — the back cover of the printed object the
+ * rest of the site is pretending to be. Three things, in the order a back
+ * cover puts them:
+ *
+ *   1. THE OFFER      "Stay in the loop" + the capture. The one action.
+ *   2. THE FINE PRINT one hairline row of tracked micro-labels.
+ *   3. THE IMPRINT    the wordmark, set enormous, edge to edge.
+ *
+ * WHY THE WORDMARK IS LAST. A page has to end on something. If the last
+ * thing is a link list, the page ends on admin. Ending on the name — at a
+ * size that can only be read as a signature rather than as information —
+ * makes the bottom of the page a destination instead of a stopping point.
+ * It is the move both reference sites make, and it is why their footers feel
+ * like arriving somewhere rather than running out of road.
+ *
+ * SEAMLESSNESS. Deliberately no top divider and no ground change: the hero
+ * ends on black and the footer starts on black, so there is no seam to see.
+ * The transition is carried by SCALE, not by a rule or a colour switch — you
+ * fall out of a full-viewport plate into a piece of type big enough to read
+ * as architecture. A colour change here (the obvious move, and what both
+ * references do — they flood the footer with their brand colour) would be a
+ * hard cut, which is the opposite of what was asked for. If that version is
+ * ever wanted instead, it is one class: put `bg-brand` on the <footer> and
+ * the whole thing becomes the site's one full blue field.
+ *
+ * The wordmark uses the header logo's exact left padding, so the tiny mark
+ * that opens the page and the enormous one that closes it start on the same
+ * vertical line.
+ *
+ * Sizing is a calc() against the AVAILABLE width, not a clamp and not a raw
+ * vw. A clamp would cap the mark on wide screens and leave a gutter that
+ * reads as under-set rather than deliberate. A raw vw looks right on desktop
+ * and then overflows on phones, because the side padding is a fixed pixel
+ * value and is therefore a much larger *share* of a 375px viewport than of a
+ * 1440px one — the measured overflow at 375px was about 4%, clipped silently
+ * by the overflow-hidden. Dividing (viewport − padding) by the string's
+ * own width-to-font-size ratio makes it span the measure at every width
+ * instead, which is the entire point of the element.
  */
 import Section from "../ui/Section.astro";
 import Container from "../ui/Container.astro";
 import NewsletterForm from "../forms/NewsletterForm.astro";
-import { footerNav, socials, site } from "../../lib/site";
+import { site } from "../../lib/site";
 
 const year = new Date().getFullYear();
 ---
 
 <footer>
-  <Section space="md" divider>
+  {/* 1 — THE OFFER. No `divider`: the seam between hero and footer is the one
+      thing this component must not have. */}
+  <Section space="md">
     <Container width="wide">
-      <div class="grid items-center gap-10 pb-20 md:grid-cols-2">
+      <div class="grid items-center gap-10 md:grid-cols-2">
         <div>
           <h2 class="text-[length:var(--text-display-md)]">Stay in the loop</h2>
           <p class="mt-3 max-w-sm text-content-muted">
             Occasional notes on pharmacology, plus first access to new cohorts.
           </p>
         </div>
+
         <NewsletterForm class="max-w-md md:justify-self-end" />
-      </div>
-
-      <div class="grid gap-10 border-t border-border pt-16 md:grid-cols-[1.4fr_repeat(4,1fr)]">
-        <div class="max-w-xs">
-          <p class="text-[clamp(15px,1.35vw,21px)] text-chalk">{site.name}</p>
-          <p class="mt-3 text-content-muted">{site.tagline}</p>
-
-          <ul class="mt-6 flex gap-3">
-            {
-              socials.map((s) => (
-                <li>
-                  <a
-                    href={s.href}
-                    rel="me noopener"
-                    class="lift grid size-10 place-items-center border border-border bg-void-900 text-content-muted hover:border-brand hover:bg-brand hover:text-chalk focus-visible:border-brand focus-visible:bg-brand focus-visible:text-chalk"
-                  >
-                    <span class="sr-only">{s.label}</span>
-                    <span aria-hidden="true" class="label">
-                      {s.label.slice(0, 2)}
-                    </span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-
-        {
-          footerNav.map((group) => (
-            <nav aria-label={group.heading}>
-              <h3 class="text-[length:var(--text-display-sm)] text-chalk">{group.heading}</h3>
-              <ul class="mt-4 flex flex-col gap-2.5">
-                {group.links.map((link) => (
-                  <li>
-                    <a
-                      href={link.href}
-                      class="text-content-muted transition-colors hover:text-chalk"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))
-        }
-      </div>
-
-      <div
-        class="mt-16 flex flex-col gap-4 border-t border-border pt-6 text-sm text-content-faint sm:flex-row sm:items-center sm:justify-between"
-      >
-        <p>&copy; {year} {site.name}. All rights reserved.</p>
-        <ul class="flex gap-6">
-          <li><a href="/legal/privacy" class="hover:text-chalk">Privacy Policy</a></li>
-          <li><a href="/legal/terms" class="hover:text-chalk">Terms of Service</a></li>
-        </ul>
       </div>
     </Container>
   </Section>
+
+  {/* 2 — THE FINE PRINT. Everything legally obliged to exist and nothing that
+      isn't, set as metadata rather than as navigation. */}
+  <div
+    class="flex flex-col gap-3 border-t border-border px-[18px] py-4 sm:flex-row sm:items-center sm:justify-between md:px-[34px]"
+  >
+    <p class="label text-content-faint">&copy; {year} {site.name}</p>
+
+    <ul class="flex gap-6">
+      <li>
+        <a href="/legal/privacy" class="label text-content-faint transition-colors hover:text-chalk">Privacy</a>
+      </li>
+      <li>
+        <a href="/legal/terms" class="label text-content-faint transition-colors hover:text-chalk">Terms</a>
+      </li>
+    </ul>
+  </div>
+
+  {/* 3 — THE IMPRINT. `aria-hidden` because this is the site name repeated as
+      an image, not as information: a screen reader already had it from the
+      header logo and from the copyright line directly above, and a third
+      reading is noise. `select-none` for the same reason — it is a mark, not
+      text anyone would copy.
+
+      The line-height is measured, not guessed. Mondwest's ink bounds for
+      this string are 0.759em above the baseline and 0.250em below it —
+      1.009em of actual glyph — while a default line box adds a band of dead
+      space under the descenders that would leave the mark floating short of
+      the page edge. Setting leading to exactly the ink height puts the tips
+      of the p, g and y ON the bottom edge with nothing beneath them.
+
+      It sits flush and COMPLETE rather than bleeding off the edge. Cropping
+      is the more dramatic option and it is what the reference does, but the
+      reference crops all-caps with no descenders; cutting through the
+      descenders of a lowercase wordmark reads as a mistake rather than as a
+      decision, and it costs the one thing this element exists to say. */}
+  <div class="overflow-hidden px-[18px] md:px-[34px]" aria-hidden="true">
+    <p
+      class="select-none whitespace-nowrap text-[calc((100vw-36px)/9.3)] leading-[1.009] tracking-[-0.01em] text-chalk md:text-[calc((100vw-68px)/9.3)]"
+    >
+      {site.name}
+    </p>
+  </div>
 </footer>

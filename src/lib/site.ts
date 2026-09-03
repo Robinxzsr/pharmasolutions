@@ -32,8 +32,18 @@ export const primaryNav: NavLink[] = [
 ];
 
 /**
- * Footer link groups. The layout assumes four columns — keep this array at
- * four entries unless the footer grid changes with it.
+ * Footer link groups.
+ *
+ * CURRENTLY UNUSED. The footer is a colophon now — wordmark, capture, and a
+ * legal hairline — and it no longer renders a sitemap (see Footer.astro).
+ * Kept here rather than deleted because it is the record of what the site's
+ * full page list actually is, and because restoring a column layout
+ * should not mean re-typing it.
+ *
+ * NOTE: everything in here that is not also in `primaryNav` is now reachable
+ * only by direct URL — Curriculum, Pricing, About, Coaches, Contact, FAQ.
+ * If those matter, they belong in `primaryNav` above, not in a resurrected
+ * footer.
  */
 export const footerNav: { heading: string; links: NavLink[] }[] = [
   {
