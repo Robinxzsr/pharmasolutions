@@ -22,7 +22,7 @@ const coaches = (await getCollection("coaches")).sort((a, b) => a.data.order - b
                 alt={`Portrait of ${coach.data.name}`}
                 width={320}
                 height={320}
-                class="block w-full"
+                class="block w-full bitmap-clip"
               />
             </div>
           )}

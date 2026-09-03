@@ -49,12 +49,12 @@ const { Content } = await render(protocol);
                 alt={coverAlt ?? ""}
                 widths={[400, 640, 800]}
                 sizes="(min-width: 1024px) 20rem, 90vw"
-                class="aspect-[16/10] w-full object-cover"
+                class="aspect-[16/10] w-full object-cover bitmap-clip"
               />
             </div>
           ) : (
             <div class="bitmap p-px [--bitmap-step:4px]">
-              <CoverPlaceholder class="aspect-[16/10] w-full" />
+              <CoverPlaceholder class="aspect-[16/10] w-full bitmap-clip" />
             </div>
           )
         }

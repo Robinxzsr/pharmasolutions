@@ -49,10 +49,11 @@ const { class: className = "" } = Astro.props;
 
     {/* The house arrow, not a second one. This was a rounded-stroke diagonal
         — the only icon on the site drawn in a different hand from the nav and
-        card glyphs. One icon system: four axis-aligned rects on a 16 grid. */}
+        card glyphs. One icon system: four axis-aligned rects on a 16 grid.
+        Hover is the original plain opacity fade, not the halftone grow. */}
     <button
       type="submit"
-      class="bitmap grid size-11 shrink-0 place-items-center text-void-950 [--bitmap-step:2px] [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] [--bitmap-dot:var(--color-void-950)] hover:[--dot-r:0.95px] focus-visible:[--dot-r:0.95px]"
+      class="bitmap grid size-11 shrink-0 place-items-center text-void-950 transition-opacity duration-[var(--duration-ui)] [--bitmap-step:2px] [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] hover:opacity-[0.88] focus-visible:opacity-[0.88]"
     >
       <span class="sr-only">Subscribe</span>
       <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">

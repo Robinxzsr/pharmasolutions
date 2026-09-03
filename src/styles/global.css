@@ -76,6 +76,11 @@
   --text-display-lg: clamp(34px, 4.2vw, 64px);
   --text-display-md: clamp(26px, 3vw, 44px);
   --text-display-sm: clamp(20px, 2vw, 30px);
+  /* One step above display-sm, reserved for card titles: display-sm reads
+     small once it's competing with the bigger body copy the bitmap cards
+     carry now, but jumping to display-md overruns a ~340px card at max
+     width. This sits between the two. */
+  --text-display-card: clamp(22px, 2.6vw, 32px);
   --text-ui: clamp(11px, 0.88vw, 14px);
 
   /* --- Shape ---------------------------------------------------------------
@@ -406,4 +411,41 @@
   /* Square-cornered member of the same family, for boxes big enough that a
      6px corner step would read as an accident rather than a decision. */
   --bitmap-clip: none;
+}
+
+@utility bitmap-clip {
+  /* For an opaque child sitting DIRECTLY inside a `bitmap` box at the same
+     size as its fill (e.g. `bitmap p-px` wrapping a cover image edge to
+     edge) — an <img> is a plain rectangle, so without this its square corners
+     paint straight over the stairstep the ink is cut to, and the frame reads
+     as broken at every corner. --bitmap-clip and --s are ordinary custom
+     properties and inherit from the ancestor .bitmap box; applying the same
+     clip-path here re-resolves that formula against THIS element's own box,
+     which — because the padding matches --bitmap-ink-w — is exactly the
+     fill's box, so the two shapes coincide. */
+  clip-path: var(--bitmap-clip);
+}
+
+@utility bitmap-clip-top {
+  /* Same idea as bitmap-clip, but for a media panel that is only the TOP
+     slice of a bitmap card (ProtocolCard, BlogCard): the cover image sits
+     above a separate text panel, so only the card's own two top corners are
+     real corners. Cutting all four the way bitmap-clip does would carve
+     stairsteps into the bottom of the image where it meets the text below —
+     an internal seam, not a card edge. This cuts the top two only and leaves
+     the bottom edge a plain straight line. */
+  clip-path: polygon(
+    calc(var(--s) * 2) 0,
+    calc(100% - var(--s) * 2) 0,
+    calc(100% - var(--s) * 2) var(--s),
+    calc(100% - var(--s)) var(--s),
+    calc(100% - var(--s)) calc(var(--s) * 2),
+    100% calc(var(--s) * 2),
+    100% 100%,
+    0 100%,
+    0 calc(var(--s) * 2),
+    var(--s) calc(var(--s) * 2),
+    var(--s) var(--s),
+    calc(var(--s) * 2) var(--s)
+  );
 }

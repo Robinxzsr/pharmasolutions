@@ -50,15 +50,18 @@ const plans = (await getCollection("plans")).sort((a, b) => a.data.order - b.dat
                 ))}
               </ul>
 
+              {/* Hover reverted to the original per-plan treatment: the
+                  highlighted plan lightens a shade (violet-500 -> violet-400,
+                  same step Button.astro's `glow` variant uses), the plain
+                  plan just fades — no dot growth on either. */}
               <button
                 type="button"
                 data-checkout={plan.data.stripePriceId}
                 class:list={[
-                  "bitmap mt-8 px-6 py-3 font-display font-bold disabled:opacity-50",
-                  "hover:[--dot-r:0.95px] focus-visible:[--dot-r:0.95px]",
+                  "bitmap mt-8 px-6 py-3 font-display font-bold transition-opacity duration-[var(--duration-ui)] disabled:opacity-50",
                   plan.data.highlighted
-                    ? "text-chalk [--bitmap-ink:var(--color-violet-500)] [--bitmap-fill:var(--color-violet-500)] [--bitmap-dot:var(--color-void-950)] hover:[--bitmap-ink:var(--color-violet-300)]"
-                    : "text-void-950 [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] [--bitmap-dot:var(--color-void-950)]",
+                    ? "text-chalk [--bitmap-ink:var(--color-violet-500)] [--bitmap-fill:var(--color-violet-500)] hover:[--bitmap-ink:var(--color-violet-400)] focus-visible:[--bitmap-ink:var(--color-violet-400)]"
+                    : "text-void-950 [--bitmap-ink:var(--color-chalk)] [--bitmap-fill:var(--color-chalk)] hover:opacity-[0.88] focus-visible:opacity-[0.88]",
                 ]}
               >
                 Choose {plan.data.name}
