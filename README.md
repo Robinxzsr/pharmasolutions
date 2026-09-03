@@ -133,11 +133,27 @@ once per build but not once per request. It matters most for the three.js chunk:
 
 Everything repeatable lives in `src/content/` as typed collections
 (`src/content.config.ts`): `blog`, `curriculum`, `coaches`, `testimonials`, `faq`,
-and `plans`. Swapping to a headless CMS later means changing the loader, not the
-components.
+`plans`, and `protocols`. Swapping to a headless CMS later means changing the
+loader, not the components.
 
 `plans` holds the Stripe price ids. The displayed price is presentational — Stripe
 remains the source of truth for what is actually charged.
+
+### The Protocols shop front
+
+`protocols` are standalone one-time-purchase guides, distinct from `plans` (the
+coaching program's own tiers). `/protocols` renders them as a card grid; each card
+is a single link through to `/protocols/<slug>`.
+
+The two take **different payment paths**, which is easy to miss: `plans` go through
+`/api/checkout` (server-validated against the collection, then Stripe Checkout),
+while `protocols` bypass that entirely and link straight to a Stripe **Payment
+Link** stored per-protocol as `checkoutUrl`. All three share one link today; the
+schema already supports giving each its own.
+
+Cards fall back to `CoverPlaceholder.astro` — an honest "art goes here" marker, not
+a fake illustration — and swap to the real image automatically once a `cover` is
+set on the entry, with no component change.
 
 ### Server routes
 
@@ -158,8 +174,12 @@ Access is granted from the **webhook**, never from the success page.
 
 ## Still to do
 
-- Real copy throughout — the seed files in `src/content/` are placeholders
-- The design pass below the hero: those Sections are structural stubs
+- Real copy throughout — the seed files in `src/content/` are placeholders, as are
+  the protocol prices
+- Cover art for the protocols (they currently render `CoverPlaceholder`)
+- `/pricing` still has the two-`Section` layout problem `/protocols` had: stacked
+  `py-24` on `py-24` making a large dead gap, plus a heading/grid container-width
+  mismatch. Same fix — merge into one section at one width.
 - Sort out the Pangram Pangram web licence (see above)
 - Bring the pill model pipeline (`build_pill.mjs` + the raw scan) into the repo so
   the GLB is reproducible rather than a committed binary
