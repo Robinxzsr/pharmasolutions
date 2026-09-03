@@ -95,4 +95,24 @@ const plans = defineCollection({
   }),
 });
 
-export const collections = { blog, curriculum, coaches, testimonials, faq, plans };
+/**
+ * Individual protocol guides — the shop-front on /protocols. Distinct from
+ * `plans`: plans are the coaching program's own tiers, protocols are
+ * standalone one-time-purchase guides sold on their own.
+ */
+const protocols = defineCollection({
+  loader: glob({ base: "./src/content/protocols", pattern: "**/*.{md,mdx}" }),
+  schema: ({ image }) =>
+    z.object({
+      name: z.string(),
+      /** One-line shop-card description. */
+      summary: z.string(),
+      priceDisplay: z.string(),
+      /** Cover art. Falls back to a placeholder in ProtocolCard until this exists. */
+      cover: image().optional(),
+      coverAlt: z.string().optional(),
+      order: z.number().default(0),
+    }),
+});
+
+export const collections = { blog, curriculum, coaches, testimonials, faq, plans, protocols };
