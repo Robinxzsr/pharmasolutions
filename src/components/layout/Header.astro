@@ -8,10 +8,17 @@
  * list of three items never needs a collapse breakpoint either, so unlike
  * the old horizontal bar there is no mobile toggle to maintain.
  *
- * Text is set in NeueBit rather than bold Mondwest: Mondwest has no true
- * bold weight, so asking for it synthesises (faux-bolds) the face, which
- * smears a pixel typeface. NeueBit is the only face here with a real bold
- * cut — the same reasoning Button.astro uses for its label.
+ * Nav links are set in NeueBit rather than bold Mondwest: Mondwest has no
+ * true bold weight, so asking for it synthesises (faux-bolds) the face,
+ * which smears a pixel typeface. NeueBit is the only face here with a real
+ * bold cut — the same reasoning Button.astro uses for its label. The logo
+ * stays on its original face/weight (Mondwest, normal) — bolding it read as
+ * a size increase even though the metrics are within a few percent.
+ *
+ * Logo-to-first-link spacing and inter-link spacing share one `gap-0.5`
+ * value rather than a hand-matched margin, so they can't drift apart again:
+ * the logo and the <nav> are both flex children of the same column, and the
+ * <ul> inside <nav> uses the identical gap.
  */
 import { primaryNav, site } from "../../lib/site";
 
@@ -21,64 +28,66 @@ const isActive = (href: string) =>
 ---
 
 <header class="absolute inset-x-0 top-0 z-50 px-[18px] py-4 md:px-[34px] md:py-[22px]">
-  <a
-    href="/"
-    class="inline-block font-display text-[clamp(15px,1.35vw,21px)] font-bold leading-none tracking-[-0.01em] text-chalk"
-  >
-    {site.name}
-  </a>
+  <div class="flex flex-col gap-0.5">
+    <a
+      href="/"
+      class="inline-block text-[clamp(15px,1.35vw,21px)] leading-none tracking-[-0.01em] text-chalk"
+    >
+      {site.name}
+    </a>
 
-  <nav aria-label="Primary" class="mt-3 md:mt-5">
-    <ul class="flex flex-col gap-0.5">
-      {
-        primaryNav.map((link) => {
-          const active = isActive(link.href);
-          return (
-            <li>
-              <a
-                href={link.href}
-                aria-current={active ? "page" : undefined}
-                class:list={[
-                  "group/nav flex items-center gap-2 py-1 font-display text-[clamp(22px,2.6vw,34px)]",
-                  "font-bold leading-[1.15] transition-colors duration-300 ease-out",
-                  "hover:text-brand-soft focus-visible:text-brand-soft",
-                  active ? "text-brand-soft" : "text-content-muted",
-                ]}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
+    <nav aria-label="Primary">
+      <ul class="flex flex-col gap-0.5">
+        {
+          primaryNav.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <li>
+                <a
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
                   class:list={[
-                    "size-[0.72em] shrink-0 transition-[transform,opacity] duration-300 ease-out",
-                    "group-hover/nav:translate-x-0 group-hover/nav:opacity-100",
-                    "group-focus-visible/nav:translate-x-0 group-focus-visible/nav:opacity-100",
-                    active ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
+                    "group/nav flex items-center gap-2 py-1 font-display text-[clamp(22px,2.6vw,34px)]",
+                    "font-bold leading-[1.15] transition-colors duration-300 ease-out",
+                    "hover:text-brand-soft focus-visible:text-brand-soft",
+                    active ? "text-brand-soft" : "text-content-muted",
                   ]}
                 >
-                  <path
-                    d="M5 12h14M13 6l6 6-6 6"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ></path>
-                </svg>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                    class:list={[
+                      "size-[0.72em] shrink-0 transition-[transform,opacity] duration-300 ease-out",
+                      "group-hover/nav:translate-x-0 group-hover/nav:opacity-100",
+                      "group-focus-visible/nav:translate-x-0 group-focus-visible/nav:opacity-100",
+                      active ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
+                    ]}
+                  >
+                    <path
+                      d="M5 12h14M13 6l6 6-6 6"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
 
-                <span
-                  class:list={[
-                    "inline-block transition-transform duration-300 ease-out",
-                    "group-hover/nav:translate-x-0 group-focus-visible/nav:translate-x-0",
-                    active ? "translate-x-0" : "-translate-x-8",
-                  ]}
-                >
-                  {link.label}
-                </span>
-              </a>
-            </li>
-          );
-        })
-      }
-    </ul>
-  </nav>
+                  <span
+                    class:list={[
+                      "inline-block transition-transform duration-300 ease-out",
+                      "group-hover/nav:translate-x-0 group-focus-visible/nav:translate-x-0",
+                      active ? "translate-x-0" : "-translate-x-8",
+                    ]}
+                  >
+                    {link.label}
+                  </span>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+  </div>
 </header>
